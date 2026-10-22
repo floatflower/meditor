@@ -11,38 +11,9 @@ import { access, cp, mkdir, readFile, readdir, stat, writeFile } from 'fs/promis
 
 const userDir = (sub: string): string => join(app.getPath('userData'), sub)
 
-const EXAMPLE_THEME = `/* A custom theme: put the rules under .markdown-body. */
-.markdown-body {
-  font-family: Georgia, 'Noto Serif TC', serif;
-  color: #3b2f2f;
-  background: #fbf6ee;
-
-  /* Mermaid diagram colours (hex / rgb() / hsl()). Variables: primary, primary-text,
-     primary-border, secondary, tertiary, line, text, background, font, node-border,
-     cluster-background, note-background, note-text, note-border, edge-label-background;
-     a dark theme also sets --mermaid-dark: true */
-  --mermaid-primary: #f1e8d8;
-  --mermaid-primary-text: #3b2f2f;
-  --mermaid-primary-border: #c9a66b;
-  --mermaid-line: #9a3412;
-  --mermaid-text: #3b2f2f;
-  --mermaid-font: Georgia, serif;
-
-  /* Chart colours: --chart-1 to --chart-8 colour the data series; --chart-text, --chart-grid
-     and --chart-font are optional (the text colour falls back to the theme's). */
-  --chart-1: #9a3412;
-  --chart-2: #c9a66b;
-  --chart-3: #6b7f3a;
-  --chart-4: #7c4a2d;
-}
-.markdown-body h1, .markdown-body h2 { border-bottom: 2px solid #c9a66b; }
-.markdown-body a { color: #9a3412; }
-.markdown-body pre { background: #f1e8d8; }
-`
-
 const SEEDS: Record<string, Record<string, string>> = {
   plugins: {},
-  themes: { 'Sepia.css': EXAMPLE_THEME }
+  themes: {}
 }
 
 // The first time a folder is created, drop in an example so users have something to copy.

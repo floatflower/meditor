@@ -3,6 +3,11 @@
   "productName": "MEditor",
   "version": "0.1.0",
   "description": "Extensible Markdown editor",
+  "author": {
+    "name": "floatflower",
+    "email": "floatflower1029@gmail.com"
+  },
+  "homepage": "https://github.com/floatflower/meditor",
   "main": "./out/main/index.js",
   "type": "module",
   "scripts": {
@@ -109,9 +114,11 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "AppImage",
+        "deb"
       ],
-      "category": "Office"
+      "category": "Office",
+      "synopsis": "Extensible Markdown editor"
     }
   }
 }

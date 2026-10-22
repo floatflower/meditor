@@ -206,6 +206,7 @@
     "mermaid": "Mermaid 圖表",
     "math": "LaTeX 數學公式",
     "chart": "圖表（Chart.js）",
+    "todo": "待辦清單",
     "noDefaultExport": "plugin 檔案沒有 default export"
   },
   "chart": {

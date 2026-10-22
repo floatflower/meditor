@@ -51,7 +51,9 @@ jobs:
           - name: linux
             os: ubuntu-latest
             args: --linux
-            files: release/*.AppImage
+            files: |
+              release/*.AppImage
+              release/*.deb
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

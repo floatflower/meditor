@@ -206,6 +206,7 @@
     "mermaid": "Mermaid diagrams",
     "math": "LaTeX math",
     "chart": "Charts (Chart.js)",
+    "todo": "To-do lists",
     "noDefaultExport": "The plugin file has no default export"
   },
   "chart": {

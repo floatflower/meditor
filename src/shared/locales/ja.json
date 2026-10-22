@@ -206,6 +206,7 @@
     "mermaid": "Mermaid 図",
     "math": "LaTeX 数式",
     "chart": "グラフ（Chart.js）",
+    "todo": "ToDo リスト",
     "noDefaultExport": "プラグインファイルに default export がありません"
   },
   "chart": {

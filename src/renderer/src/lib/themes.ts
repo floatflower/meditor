@@ -1,5 +1,4 @@
 import defaultCss from '../styles/theme-default.css?raw'
-import darkCss from '../styles/theme-dark.css?raw'
 
 export interface Theme {
   name: string
@@ -8,6 +7,5 @@ export interface Theme {
 }
 
 export const builtinThemes: Theme[] = [
-  { name: 'Default', css: defaultCss, builtin: true },
-  { name: 'Dark', css: darkCss, builtin: true }
+  { name: 'Default', css: defaultCss, builtin: true }
 ]

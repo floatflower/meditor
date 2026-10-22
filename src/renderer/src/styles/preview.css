@@ -23,8 +23,9 @@
 .markdown-body ol { list-style: decimal; padding-left: 2em; }
 .markdown-body ul ul { list-style: circle; }
 .markdown-body ul ul ul { list-style: square; }
-.markdown-body li + li { margin-top: 0.25em; }
-.markdown-body li > ul, .markdown-body li > ol { margin: 0.25em 0 0; }
+.markdown-body li { line-height: 1.5; }
+.markdown-body li + li { margin-top: 0.1em; }
+.markdown-body li > ul, .markdown-body li > ol { margin: 0.1em 0 0; }
 .markdown-body ul.contains-task-list, .markdown-body li.task-list-item { list-style: none; }
 .markdown-body li.task-list-item input { margin: 0 0.4em 0 -1.4em; vertical-align: middle; }
 .markdown-body strong { font-weight: 700; }
@@ -43,7 +44,7 @@
 .markdown-body img,
 .markdown-body svg { max-width: 100%; height: auto; }
 .markdown-body pre { overflow-x: auto; padding: 1rem; border-radius: 6px; }
-.markdown-body table { border-collapse: collapse; }
+.markdown-body table { border-collapse: collapse; width: 100%; }
 .markdown-body th, .markdown-body td { padding: 0.4rem 0.8rem; }
 .markdown-body .mermaid-block { display: flex; justify-content: center; margin: 1.25rem 0; }
 .markdown-body .mermaid-error { color: #b91c1c; white-space: pre-wrap; font: 12px/1.5 monospace; }
