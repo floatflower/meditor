@@ -1,0 +1,38 @@
+import { app } from 'electron'
+import { randomBytes } from 'crypto'
+import { readFile, writeFile } from 'fs/promises'
+import { join } from 'path'
+
+export interface McpSettings {
+  /** The server only listens while this is on. Off by default. */
+  enabled: boolean
+  /** Without this the AI can read the document but not change it. */
+  allowWrite: boolean
+  /** Bearer token clients must send. Stable across restarts so client configs keep working. */
+  token: string
+  port: number
+}
+
+export interface Settings {
+  mcp: McpSettings
+}
+
+export const newToken = (): string => randomBytes(24).toString('hex')
+
+const file = (): string => join(app.getPath('userData'), 'settings.json')
+
+export async function loadSettings(): Promise<Settings> {
+  let saved: Partial<Settings> = {}
+  try {
+    saved = JSON.parse(await readFile(file(), 'utf-8'))
+  } catch {
+    /* first run, or an unreadable file: fall back to the defaults */
+  }
+  const mcp = { enabled: false, allowWrite: false, token: '', port: 39217, ...saved.mcp }
+  if (!mcp.token) mcp.token = newToken()
+  return { mcp }
+}
+
+export async function saveSettings(settings: Settings): Promise<void> {
+  await writeFile(file(), JSON.stringify(settings, null, 2), { encoding: 'utf-8', mode: 0o600 })
+}

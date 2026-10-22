@@ -1,0 +1,101 @@
+name: Release
+
+# Runs for version tags only, and builds nothing unless the tagged commit is on main.
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+
+jobs:
+  # GitHub cannot filter tag pushes by branch, so check it here.
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      on_main: ${{ steps.check.outputs.on_main }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the whole history, so origin/main is available to compare with
+      - id: check
+        run: |
+          if git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "on_main=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "on_main=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Tag $GITHUB_REF_NAME is not on main, so no release is built."
+          fi
+
+  build:
+    needs: check
+    if: needs.check.outputs.on_main == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macos
+            os: macos-latest
+            # One arm64 runner builds both architectures; the app has no native modules.
+            args: --mac --x64 --arm64
+            files: release/*.dmg
+          - name: windows
+            os: windows-latest
+            args: --win --x64
+            files: release/*.exe
+          - name: linux
+            os: ubuntu-latest
+            args: --linux
+            files: release/*.AppImage
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Package
+        shell: bash
+        env:
+          # No signing certificates are configured. Without this macOS would go looking for one.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          # The tag is the version: v1.2.3 -> 1.2.3 (package.json is left untouched).
+          VERSION="${GITHUB_REF_NAME#v}"
+          npx electron-builder ${{ matrix.args }} -c.extraMetadata.version="$VERSION" --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the release and upload the installers
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -l dist
+          # Tags like v1.0.0-beta.1 are published as pre-releases.
+          PRERELEASE=""
+          case "$GITHUB_REF_NAME" in *-*) PRERELEASE="--prerelease" ;; esac
+
+          # Re-running a failed workflow must not fail just because the release already exists.
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag --generate-notes --title "$GITHUB_REF_NAME" $PRERELEASE
+          fi
