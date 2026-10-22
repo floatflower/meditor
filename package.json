@@ -1,5 +1,6 @@
 {
-  "name": "mdeditor",
+  "name": "meditor",
+  "productName": "MEditor",
   "version": "0.1.0",
   "description": "Extensible Markdown editor",
   "main": "./out/main/index.js",
@@ -69,8 +70,8 @@
     }
   },
   "build": {
-    "appId": "com.floatflower.mdeditor",
-    "productName": "mdeditor",
+    "appId": "com.floatflower.meditor",
+    "productName": "MEditor",
     "files": [
       "out/**/*",
       "package.json"

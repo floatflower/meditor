@@ -1,9 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePanelRef } from 'react-resizable-panels'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import Editor, { type EditorHandle } from '@/components/Editor'
 import Header, { type ViewMode } from '@/components/Header'
+import FolderSidebar from '@/components/FolderSidebar'
+import TabBar from '@/components/TabBar'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
+import type { FolderScan, TreeNode } from '../../main/folder'
 import Preview from '@/components/Preview'
 import { builtinThemes, type Theme } from '@/lib/themes'
 import { loadPlugins, type PluginEntry } from '@/lib/plugins'
@@ -12,46 +26,35 @@ import { buildSyntaxGuide } from '@/lib/syntaxGuide'
 import type { MdPlugin } from '@/lib/markdown'
 import type { MenuAction } from '../../main/menu'
 
-const WELCOME = `# Hello mdeditor
+interface Tab {
+  id: number
+  path: string | null
+  name: string
+  text: string
+  /** Edited since it was opened or last saved. */
+  dirty: boolean
+}
 
-支援 GFM、程式碼高亮與 mermaid：
-
-\`\`\`ts
-const greet = (name: string) => \`Hello, \${name}\`
-\`\`\`
-
-\`\`\`mermaid
-graph LR
-  A[Markdown] --> B(unified) --> C[HTML / PDF]
-\`\`\`
-
-| 功能 | 狀態 |
-| --- | --- |
-| 自訂 theme | ✅ |
-| LaTeX | ✅ |
-| plugin | ✅ |
-
-行內公式 $E = mc^2$，區塊公式：
-
-$$
-\\int_0^1 x^2\\,dx = \\frac{1}{3}
-$$
-
-:::chart{type=bar title="月營收"}
-| 月份 | 2024 | 2025 |
-| --- | --- | --- |
-| 1 月 | 10 | 12 |
-| 2 月 | 20 | 18 |
-| 3 月 | 15 | 25 |
-:::
-
-:::note
-這是內建的 \`:::note\` 提示區塊。
-:::
-`
+type SaveChoice = 'save' | 'discard' | 'cancel'
 
 const THEME_KEY = 'mdeditor.theme'
 const DISABLED_PLUGINS_KEY = 'mdeditor.disabledPlugins'
+// Below this window width the sidebar is tucked away and slides over the editor on demand.
+const NARROW_WIDTH = 900
+const isNarrow = (): boolean => window.innerWidth < NARROW_WIDTH
+const SIDEBAR_KEY = 'mdeditor.sidebarWidth'
+const SIDEBAR_MIN = 160
+const SIDEBAR_MAX = 520
+
+function readSidebarWidth(): number {
+  try {
+    const saved = Number(localStorage.getItem(SIDEBAR_KEY))
+    if (saved >= SIDEBAR_MIN && saved <= SIDEBAR_MAX) return saved
+  } catch {
+    /* fall through to the default */
+  }
+  return 260
+}
 
 function readDisabledPlugins(): Set<string> {
   try {
@@ -69,10 +72,37 @@ function readSavedTheme(): string {
   }
 }
 
+/** Directories on the way to `path`, so the sidebar can reveal the file that is open. */
+function ancestorsOf(tree: TreeNode[], path: string): string[] {
+  for (const node of tree) {
+    if (node.path === path) return []
+    if (node.dir && node.children) {
+      const inner = ancestorsOf(node.children, path)
+      if (inner.length || node.children.some((c) => c.path === path)) return [node.path, ...inner]
+    }
+  }
+  return []
+}
+
+const countNodes = (tree: TreeNode[]): number => tree.reduce((n, node) => n + 1 + (node.children ? countNodes(node.children) : 0), 0)
+const allDirectories = (tree: TreeNode[]): string[] =>
+  tree.flatMap((node) => (node.dir ? [node.path, ...allDirectories(node.children ?? [])] : []))
+
 export default function App(): React.JSX.Element {
-  const [doc, setDoc] = useState({ id: 0, path: null as string | null, name: 'untitled.md', initial: WELCOME })
-  const [text, setText] = useState(WELCOME)
-  const [dirty, setDirty] = useState(false)
+  const [tabs, setTabs] = useState<Tab[]>(() => [{ id: 1, path: null, name: 'untitled.md', text: '', dirty: false }])
+  const [activeId, setActiveId] = useState(1)
+  const nextTabId = useRef(2)
+  const tabsRef = useRef(tabs)
+  tabsRef.current = tabs
+  const doc = tabs.find((t) => t.id === activeId) ?? tabs[0]
+  const activeIdRef = useRef(doc.id)
+  activeIdRef.current = doc.id
+  const text = doc.text
+  const dirty = doc.dirty
+  // Set while the "save before closing?" dialog is up; answering resolves the promise `askSave` returned.
+  const [savePrompt, setSavePrompt] = useState<{ name: string } | null>(null)
+  const savePromptResolve = useRef<((choice: SaveChoice) => void) | null>(null)
+  const saveButton = useRef<HTMLButtonElement>(null)
   const [userThemes, setUserThemes] = useState<Theme[]>([])
   const [themeName, setThemeName] = useState(readSavedTheme)
   const [pluginEntries, setPluginEntries] = useState<PluginEntry[]>([])
@@ -90,6 +120,11 @@ export default function App(): React.JSX.Element {
   const textRef = useRef(text)
   textRef.current = text
   const editor = useRef<EditorHandle>(null)
+  const [workspace, setWorkspace] = useState<FolderScan | null>(null)
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set())
+  const [sidebarWidth, setSidebarWidth] = useState(readSidebarWidth)
+  const [narrow, setNarrow] = useState(isNarrow)
+  const [sidebarOpen, setSidebarOpen] = useState(() => !isNarrow())
   const editorPanel = usePanelRef()
   const previewPanel = usePanelRef()
 
@@ -137,36 +172,197 @@ export default function App(): React.JSX.Element {
     })
   }, [themes, theme.name, pluginEntries])
 
-  const confirmDiscard = useCallback(
-    (): boolean => !dirty || window.confirm('目前的檔案有尚未儲存的變更，確定要捨棄嗎？'),
-    [dirty]
-  )
-
-  const load = (path: string | null, name: string, content: string): void => {
-    setDoc((d) => ({ id: d.id + 1, path, name, initial: content }))
-    setText(content)
-    setDirty(false)
-  }
+  // --- tabs ----------------------------------------------------------------------------------
+  /** Open a document in a tab, or switch to the tab that already has it. */
+  const openTab = useCallback((path: string | null, name: string, content: string) => {
+    const existing = path ? tabsRef.current.find((t) => t.path === path) : undefined
+    if (existing) {
+      setActiveId(existing.id)
+      return
+    }
+    const fresh: Tab = { id: nextTabId.current++, path, name, text: content, dirty: false }
+    // An untouched blank tab is replaced rather than left sitting next to the real file.
+    const only = tabsRef.current.length === 1 ? tabsRef.current[0] : undefined
+    const replaceable = !!path && !!only && only.path === null && !only.dirty && only.text === ''
+    if (replaceable) editor.current?.forget(String(only.id))
+    setTabs((ts) => (replaceable ? [fresh] : [...ts, fresh]))
+    setActiveId(fresh.id)
+  }, [])
 
   const newFile = useCallback(() => {
-    if (confirmDiscard()) load(null, 'untitled.md', '')
-  }, [confirmDiscard])
+    const names = new Set(tabsRef.current.map((t) => t.name))
+    let name = 'untitled.md'
+    for (let n = 2; names.has(name); n++) name = `untitled-${n}.md`
+    openTab(null, name, '')
+  }, [openTab])
 
   const open = useCallback(async () => {
-    if (!confirmDiscard()) return
     const file = await window.api.openFile()
-    if (file) load(file.path, file.name, file.content)
-  }, [confirmDiscard])
+    if (file) openTab(file.path, file.name, file.content)
+  }, [openTab])
 
-  const save = useCallback(
-    async (asNew: boolean) => {
-      const saved = await window.api.saveFile(asNew ? null : doc.path, textRef.current)
-      if (!saved) return
-      setDoc((d) => ({ ...d, path: saved.path, name: saved.name }))
-      setDirty(false)
-      setStatus(`已儲存 ${saved.name}`)
+  /** Save one tab (not necessarily the visible one). Resolves false if the user backed out. */
+  const saveTab = useCallback(async (id: number, asNew = false): Promise<boolean> => {
+    const tab = tabsRef.current.find((t) => t.id === id)
+    if (!tab) return false
+    const savedText = tab.text
+    const saved = await window.api.saveFile(asNew ? null : tab.path, savedText)
+    if (!saved) return false
+    // Typing may have continued while a save dialog was open: stay dirty if the text moved on.
+    setTabs((ts) => ts.map((t) => (t.id === id ? { ...t, path: saved.path, name: saved.name, dirty: t.text !== savedText } : t)))
+    setStatus(`已儲存 ${saved.name}`)
+    return true
+  }, [])
+
+  const askSave = useCallback(
+    (tab: Tab) =>
+      new Promise<SaveChoice>((resolve) => {
+        savePromptResolve.current = resolve
+        setSavePrompt({ name: tab.name })
+      }),
+    []
+  )
+
+  const answerSave = useCallback((choice: SaveChoice) => {
+    savePromptResolve.current?.(choice) // a second answer (the dialog closing itself) finds nothing to resolve
+    savePromptResolve.current = null
+    setSavePrompt(null)
+  }, [])
+
+  const closeTab = useCallback(
+    async (id: number) => {
+      const tab = tabsRef.current.find((t) => t.id === id)
+      if (!tab) return
+      if (tab.dirty) {
+        const choice = await askSave(tab)
+        if (choice === 'cancel') return
+        if (choice === 'save' && !(await saveTab(id))) return
+      }
+      const all = tabsRef.current
+      const index = all.findIndex((t) => t.id === id)
+      const rest = all.filter((t) => t.id !== id)
+      editor.current?.forget(String(id))
+
+      if (rest.length === 0) {
+        // Never leave the editor without a document.
+        const blank: Tab = { id: nextTabId.current++, path: null, name: 'untitled.md', text: '', dirty: false }
+        setTabs([blank])
+        setActiveId(blank.id)
+        return
+      }
+      setTabs(rest)
+      if (id === activeIdRef.current) setActiveId(rest[Math.min(index, rest.length - 1)].id)
     },
-    [doc.path]
+    [askSave, saveTab]
+  )
+
+  // --- open-folder mode ----------------------------------------------------------------------
+  const openWorkspace = useCallback(async (root: string) => {
+    try {
+      const scan = await window.api.scanFolder(root)
+      setWorkspace(scan)
+      setSidebarOpen(true)
+      // A small tree opens fully; a large one stays collapsed until the user digs in.
+      setExpanded(new Set(countNodes(scan.tree) <= 40 ? allDirectories(scan.tree) : []))
+    } catch (err) {
+      setStatus(`無法開啟資料夾：${err instanceof Error ? err.message : String(err)}`)
+    }
+  }, [])
+
+  const refreshWorkspace = useCallback(async () => {
+    if (!workspace) return
+    try {
+      setWorkspace(await window.api.scanFolder(workspace.root))
+    } catch {
+      setWorkspace(null) // the folder is gone
+    }
+  }, [workspace])
+
+  const closeWorkspace = useCallback(() => {
+    window.api.stopWatchingFolder()
+    setWorkspace(null)
+  }, [])
+
+  const toggleFolder = useCallback((path: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(path)) next.delete(path)
+      else next.add(path)
+      return next
+    })
+  }, [])
+
+  const openFromTree = useCallback(
+    async (path: string) => {
+      if (narrow) setSidebarOpen(false)
+      const existing = tabsRef.current.find((t) => t.path === path)
+      if (existing) return setActiveId(existing.id)
+      try {
+        const file = await window.api.readFile(path)
+        openTab(file.path, file.name, file.content)
+      } catch (err) {
+        setStatus(`無法開啟 ${path}：${err instanceof Error ? err.message : String(err)}`)
+        void refreshWorkspace() // most likely the file was deleted
+      }
+    },
+    [narrow, openTab, refreshWorkspace]
+  )
+
+  // Show where the open file lives, even in a collapsed tree.
+  useEffect(() => {
+    if (!workspace || !doc.path) return
+    const parents = ancestorsOf(workspace.tree, doc.path)
+    if (parents.length) setExpanded((prev) => (parents.every((p) => prev.has(p)) ? prev : new Set([...prev, ...parents])))
+  }, [workspace, doc.path])
+
+  // Crossing the breakpoint either way resets the sidebar: hidden when narrow, shown when wide.
+  // Uses `resize` rather than a media-query listener because that fires without waiting for a paint.
+  const wasNarrow = useRef(isNarrow())
+  useEffect(() => {
+    const onResize = (): void => {
+      const now = isNarrow()
+      if (now === wasNarrow.current) return
+      wasNarrow.current = now
+      setNarrow(now)
+      setSidebarOpen(!now)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  const overlayOpen = !!workspace && narrow && sidebarOpen
+  useEffect(() => {
+    if (!overlayOpen) return
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') setSidebarOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [overlayOpen])
+
+  const startSidebarDrag = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const startX = e.clientX
+      const startWidth = sidebarWidth
+      let width = startWidth
+      const move = (ev: PointerEvent): void => {
+        width = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWidth + ev.clientX - startX))
+        setSidebarWidth(width)
+      }
+      const up = (): void => {
+        window.removeEventListener('pointermove', move)
+        window.removeEventListener('pointerup', up)
+        try {
+          localStorage.setItem(SIDEBAR_KEY, String(width))
+        } catch {
+          /* the width just won't be remembered */
+        }
+      }
+      window.addEventListener('pointermove', move)
+      window.addEventListener('pointerup', up)
+      e.preventDefault()
+    },
+    [sidebarWidth]
   )
 
   const exportAs = useCallback(
@@ -311,15 +507,19 @@ export default function App(): React.JSX.Element {
     switch (a.type) {
       case 'new': return newFile()
       case 'open': return void open()
-      case 'save': return void save(false)
-      case 'save-as': return void save(true)
+      case 'save': return void saveTab(activeIdRef.current)
+      case 'save-as': return void saveTab(activeIdRef.current, true)
+      case 'close-tab': return void closeTab(activeIdRef.current)
       case 'export-html': return void exportAs('html')
       case 'export-pdf': return void exportAs('pdf')
       case 'theme': return pickTheme(a.name)
       case 'plugin-toggle': return togglePlugin(a.file, a.enabled)
       case 'reload-extensions': return void reloadExtensions()
       case 'notice': return setStatus(a.text)
-      case 'open-external': return void (confirmDiscard() && load(a.path, a.name, a.content))
+      case 'open-workspace': return void openWorkspace(a.root)
+      case 'close-workspace': return closeWorkspace()
+      case 'workspace-changed': return void refreshWorkspace()
+      case 'open-external': return openTab(a.path, a.name, a.content)
       case 'open-folder': return void window.api.userPaths().then((p) => window.api.openPath(p[a.kind]))
     }
   }
@@ -338,53 +538,119 @@ export default function App(): React.JSX.Element {
           onModeChange={setMode}
           onCommand={(c) => editor.current?.exec(c)}
           enabledPlugins={enabledPlugins}
+          sidebar={workspace ? { open: sidebarOpen, onToggle: () => setSidebarOpen((o) => !o) } : undefined}
         />
 
-        <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
-          <ResizablePanel
-            panelRef={editorPanel}
-            collapsible
-            collapsedSize="0%"
-            defaultSize="50%"
-            minSize="20%"
-            className="overflow-hidden"
-            onResize={(size) => size.asPercentage === 0 && setMode((m) => (m === 'split' ? 'preview' : m))}
-          >
-            <Editor
-              ref={editor}
-              value={doc.initial}
-              docKey={String(doc.id)}
-              onChange={(v) => {
-                setText(v)
-                setDirty(true)
-              }}
-            />
-          </ResizablePanel>
-          <ResizableHandle withHandle className={mode !== 'split' ? 'pointer-events-none opacity-0' : ''} />
-          <ResizablePanel
-            panelRef={previewPanel}
-            collapsible
-            collapsedSize="0%"
-            defaultSize="50%"
-            minSize="20%"
-            className="overflow-hidden"
-            onResize={(size) => size.asPercentage === 0 && setMode((m) => (m === 'split' ? 'editor' : m))}
-          >
-            <Preview
-              source={text}
-              themeCss={theme.css}
-              plugins={plugins}
-              onRendered={(source, error) => {
-                rendered.current = { source, error }
-              }}
-            />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+        <div className="relative flex min-h-0 flex-1">
+          {workspace && sidebarOpen && !narrow && (
+            <>
+              <FolderSidebar
+                width={sidebarWidth}
+                scan={workspace}
+                currentPath={doc.path}
+                expanded={expanded}
+                onToggle={toggleFolder}
+                onOpen={(path) => void openFromTree(path)}
+                onRefresh={() => void refreshWorkspace()}
+                onClose={closeWorkspace}
+              />
+              <div
+                role="separator"
+                aria-orientation="vertical"
+                aria-label="調整側欄寬度"
+                onPointerDown={startSidebarDrag}
+                className="-ml-0.5 w-1 shrink-0 cursor-col-resize touch-none bg-transparent hover:bg-ring/40 active:bg-ring/60"
+              />
+            </>
+          )}
+          {overlayOpen && workspace && (
+            <div className="absolute inset-0 z-30 flex">
+              <FolderSidebar
+                width={sidebarWidth}
+                className="bg-background shadow-xl"
+                scan={workspace}
+                currentPath={doc.path}
+                expanded={expanded}
+                onToggle={toggleFolder}
+                onOpen={(path) => void openFromTree(path)}
+                onRefresh={() => void refreshWorkspace()}
+                onClose={closeWorkspace}
+              />
+              <button type="button" aria-label="關閉側欄" className="min-w-0 flex-1 cursor-default bg-black/30" onClick={() => setSidebarOpen(false)} />
+            </div>
+          )}
+          <div className="flex min-w-0 flex-1 flex-col">
+          <TabBar tabs={tabs} activeId={doc.id} onSelect={setActiveId} onClose={(id) => void closeTab(id)} />
+          <div className="min-h-0 flex-1">
+          <ResizablePanelGroup orientation="horizontal" className="h-full">
+            <ResizablePanel
+              panelRef={editorPanel}
+              collapsible
+              collapsedSize="0%"
+              defaultSize="50%"
+              minSize="20%"
+              className="overflow-hidden"
+              onResize={(size) => size.asPercentage === 0 && setMode((m) => (m === 'split' ? 'preview' : m))}
+            >
+              <Editor
+                ref={editor}
+                value={doc.text}
+                docKey={String(doc.id)}
+                onChange={(v) => setTabs((ts) => ts.map((t) => (t.id === doc.id ? { ...t, text: v, dirty: true } : t)))}
+              />
+            </ResizablePanel>
+            <ResizableHandle withHandle className={mode !== 'split' ? 'pointer-events-none opacity-0' : ''} />
+            <ResizablePanel
+              panelRef={previewPanel}
+              collapsible
+              collapsedSize="0%"
+              defaultSize="50%"
+              minSize="20%"
+              className="overflow-hidden"
+              onResize={(size) => size.asPercentage === 0 && setMode((m) => (m === 'split' ? 'editor' : m))}
+            >
+              <Preview
+                source={text}
+                themeCss={theme.css}
+                plugins={plugins}
+                onRendered={(source, error) => {
+                  rendered.current = { source, error }
+                }}
+              />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+          </div>
+          </div>
+        </div>
 
         <footer className="truncate border-t px-3 py-1 text-xs text-muted-foreground">
           {status || `${text.length} 字元`}
         </footer>
       </div>
+
+      <AlertDialog open={!!savePrompt} onOpenChange={(open) => !open && answerSave('cancel')}>
+        <AlertDialogContent
+          // Enter should save, never discard: put the focus on 儲存 instead of the dialog's default.
+          onOpenAutoFocus={(e) => {
+            e.preventDefault()
+            saveButton.current?.focus()
+          }}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>「{savePrompt?.name}」尚未儲存</AlertDialogTitle>
+            <AlertDialogDescription>要在關閉前儲存對這個檔案的變更嗎？</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => answerSave('cancel')}>取消</AlertDialogCancel>
+            <Button variant="outline" className="cursor-pointer" onClick={() => answerSave('discard')}>
+              不儲存
+            </Button>
+            <AlertDialogAction ref={saveButton} onClick={() => answerSave('save')}>
+              儲存
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TooltipProvider>
   )
 }

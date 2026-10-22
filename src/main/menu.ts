@@ -22,8 +22,12 @@ export type MenuAction =
   | { type: 'theme'; name: string }
   | { type: 'plugin-toggle'; file: string; enabled: boolean }
   | { type: 'reload-extensions' }
+  | { type: 'close-tab' }
   | { type: 'notice'; text: string }
   | { type: 'open-external'; path: string; name: string; content: string }
+  | { type: 'open-workspace'; root: string }
+  | { type: 'close-workspace' }
+  | { type: 'workspace-changed' }
   | { type: 'open-folder'; kind: 'themes' | 'plugins' }
 
 function send(action: MenuAction): void {
@@ -41,6 +45,7 @@ export interface AiMenuState {
 /** What these menu items do. They run in the main process, so the menu does not message the editor. */
 export interface MenuActions {
   setAsDefault: () => void
+  openFolder: () => void
   toggleEnabled: (enabled: boolean) => void
   toggleWrite: (allow: boolean) => void
   copyCommand: () => void
@@ -56,6 +61,9 @@ export function buildMenu(state: MenuState, ai: AiMenuState, actions: MenuAction
     submenu: [
       { label: '開新檔案', accelerator: 'CmdOrCtrl+N', click: () => send({ type: 'new' }) },
       { label: '開啟…', accelerator: 'CmdOrCtrl+O', click: () => send({ type: 'open' }) },
+      { label: '開啟資料夾…', accelerator: 'CmdOrCtrl+Shift+O', click: () => actions.openFolder() },
+      { label: '關閉資料夾', click: () => send({ type: 'close-workspace' }) },
+      { label: '關閉分頁', accelerator: 'CmdOrCtrl+W', click: () => send({ type: 'close-tab' }) },
       { type: 'separator' },
       { label: '儲存', accelerator: 'CmdOrCtrl+S', click: () => send({ type: 'save' }) },
       { label: '另存新檔…', accelerator: 'CmdOrCtrl+Shift+S', click: () => send({ type: 'save-as' }) },

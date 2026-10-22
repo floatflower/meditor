@@ -33,7 +33,7 @@ const safeEqual = (a: string, b: string): boolean => {
 
 /** A fresh server per request (stateless mode): the editor is the only state there is. */
 function buildServer(settings: () => McpSettings, call: CallRenderer): McpServer {
-  const server = new McpServer({ name: 'mdeditor', version: '0.1.0' })
+  const server = new McpServer({ name: 'meditor', version: '0.1.0' })
 
   // Run a renderer call and turn its failure into a tool error the model can read and react to.
   const run = async (method: string, args?: unknown): Promise<ReturnType<typeof text> | ReturnType<typeof failure>> => {

@@ -10,5 +10,5 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "paths": { "@/*": ["./src/renderer/src/*"] }
   },
-  "include": ["src/renderer/src/**/*", "src/preload/index.d.ts", "src/main/menu.ts"]
+  "include": ["src/renderer/src/**/*", "src/preload/index.d.ts", "src/main/menu.ts", "src/main/folder.ts"]
 }

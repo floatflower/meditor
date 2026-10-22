@@ -13,6 +13,7 @@ import {
   Link,
   List,
   ListChecks,
+  Menu,
   ListOrdered,
   Minus,
   PencilLine,
@@ -97,14 +98,35 @@ interface Props {
   onCommand: (command: EditorCommand) => void
   /** Ids of the plugins that are currently enabled. */
   enabledPlugins: ReadonlySet<string>
+  /** Present only while a folder is open: the sidebar toggle shown at the far left. */
+  sidebar?: { open: boolean; onToggle: () => void }
 }
 
-export default function Header({ mode, onModeChange, onCommand, enabledPlugins }: Props): React.JSX.Element {
+export default function Header({ mode, onModeChange, onCommand, enabledPlugins, sidebar }: Props): React.JSX.Element {
   const editing = mode !== 'preview'
 
   return (
     <header className="flex items-center justify-between gap-2 border-b px-2 py-1">
       <div className="flex items-center gap-1 overflow-x-auto">
+        {sidebar && (
+          <>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="側欄"
+                  aria-expanded={sidebar.open}
+                  onClick={sidebar.onToggle}
+                >
+                  <Menu />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{sidebar.open ? '收合側欄' : '展開側欄'}</TooltipContent>
+            </Tooltip>
+            <Separator orientation="vertical" className="mx-1 h-5" />
+          </>
+        )}
         {GROUPS.map((group, i) => (
           <div key={i} className="flex items-center gap-0.5">
             {i > 0 && <Separator orientation="vertical" className="mx-1 h-5" />}

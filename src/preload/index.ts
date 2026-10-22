@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { MenuAction, MenuState } from '../main/menu'
+import type { FolderScan } from '../main/folder'
 
 const api = {
   openFile: () => ipcRenderer.invoke('file:open'),
@@ -28,6 +29,10 @@ const api = {
     ipcRenderer.send('mcp:response', id, payload),
   /** Tell the main process the menu/request listeners are registered, so queued files can be delivered. */
   rendererReady: () => ipcRenderer.send('renderer:ready'),
+  scanFolder: (root: string): Promise<FolderScan> => ipcRenderer.invoke('folder:scan', root),
+  stopWatchingFolder: () => ipcRenderer.send('folder:unwatch'),
+  readFile: (path: string): Promise<{ path: string; name: string; content: string }> =>
+    ipcRenderer.invoke('file:read', path),
   openPath: (path: string) => ipcRenderer.invoke('shell:open-path', path)
 }
 

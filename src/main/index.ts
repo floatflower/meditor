@@ -1,9 +1,10 @@
 import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, shell } from 'electron'
 import { join, basename, resolve } from 'path'
-import { buildMenu, type MenuActions, type MenuState } from './menu'
+import { buildMenu, type MenuAction, type MenuActions, type MenuState } from './menu'
 import { McpController } from './mcp'
+import { scanFolder, stopWatching, watchFolder } from './folder'
 import { loadSettings, newToken, saveSettings, type Settings } from './settings'
-import { access, mkdir, readFile, readdir, writeFile } from 'fs/promises'
+import { access, cp, mkdir, readFile, readdir, stat, writeFile } from 'fs/promises'
 
 const userDir = (sub: string): string => join(app.getPath('userData'), sub)
 
@@ -60,6 +61,20 @@ let menuState: MenuState = { themes: [], currentTheme: '', plugins: [] }
 let settings: Settings
 let mcp: McpController
 
+// The app used to be called "mdeditor", and Electron keys its data folder on the app name. Carry the
+// settings and extensions over to the new folder once. Safe to delete when no old build is around.
+async function migrateLegacyData(): Promise<void> {
+  const legacy = join(app.getPath('appData'), 'mdeditor')
+  const current = app.getPath('userData')
+  const exists = (path: string): Promise<boolean> => access(path).then(() => true, () => false)
+  if (legacy === current || (await exists(join(current, 'settings.json'))) || !(await exists(join(legacy, 'settings.json')))) {
+    return
+  }
+  for (const name of ['settings.json', 'themes', 'plugins', 'Local Storage']) {
+    await cp(join(legacy, name), join(current, name), { recursive: true, force: false }).catch(() => {})
+  }
+}
+
 // --- AI (MCP) ---------------------------------------------------------------------------------
 
 let nextRequestId = 1
@@ -85,8 +100,12 @@ function callRenderer(method: string, args?: unknown): Promise<unknown> {
 
 const mcpUrl = (): string => `http://127.0.0.1:${settings.mcp.port}/mcp`
 
+function sendToRenderer(action: MenuAction): void {
+  BrowserWindow.getAllWindows()[0]?.webContents.send('menu:action', action)
+}
+
 function notify(text: string): void {
-  BrowserWindow.getAllWindows()[0]?.webContents.send('menu:action', { type: 'notice', text })
+  sendToRenderer({ type: 'notice', text })
 }
 
 function rebuildMenu(): void {
@@ -105,6 +124,10 @@ async function applyMcpSettings(): Promise<void> {
 
 const menuActions: MenuActions = {
   setAsDefault: () => void showDefaultAppGuide(),
+  openFolder: async () => {
+    const r = await dialog.showOpenDialog({ properties: ['openDirectory'] })
+    if (!r.canceled && r.filePaths[0]) sendToRenderer({ type: 'open-workspace', root: r.filePaths[0] })
+  },
   toggleEnabled: (enabled) => {
     settings.mcp.enabled = enabled
     if (!enabled) settings.mcp.allowWrite = false
@@ -116,7 +139,7 @@ const menuActions: MenuActions = {
   },
   copyCommand: () => {
     clipboard.writeText(
-      `claude mcp add --transport http mdeditor ${mcpUrl()} --header "Authorization: Bearer ${settings.mcp.token}"`
+      `claude mcp add --transport http meditor ${mcpUrl()} --header "Authorization: Bearer ${settings.mcp.token}"`
     )
     notify('已複製 Claude Code 連線指令（含 token，請勿公開分享）')
   },
@@ -125,7 +148,7 @@ const menuActions: MenuActions = {
       JSON.stringify(
         {
           mcpServers: {
-            mdeditor: { type: 'http', url: mcpUrl(), headers: { Authorization: `Bearer ${settings.mcp.token}` } }
+            meditor: { type: 'http', url: mcpUrl(), headers: { Authorization: `Bearer ${settings.mcp.token}` } }
           }
         },
         null,
@@ -155,6 +178,18 @@ function registerIpc(): void {
     menuState = state
     rebuildMenu()
   })
+
+  ipcMain.handle('folder:scan', async (_e, root: string) => {
+    watchFolder(root, () => sendToRenderer({ type: 'workspace-changed' }))
+    return scanFolder(root)
+  })
+  ipcMain.on('folder:unwatch', () => stopWatching())
+
+  ipcMain.handle('file:read', async (_e, path: string) => ({
+    path,
+    name: basename(path),
+    content: await readFile(path, 'utf-8')
+  }))
 
   ipcMain.on('renderer:ready', () => {
     rendererReady = true
@@ -249,11 +284,11 @@ const MARKDOWN_EXT = /\.(md|markdown|mdown|txt)$/i
 let pendingOpen: string | null = null
 let rendererReady = false
 
-/** Paths in a command line that look like documents. Dev runs have two leading args (electron, "."). */
+/** Path arguments of a command line (flags are skipped). Dev runs have two leading args (electron, "."). */
 function pathsFromArgv(argv: string[], cwd: string): string[] {
   return argv
     .slice(app.isPackaged ? 1 : 2)
-    .filter((a) => !a.startsWith('-') && MARKDOWN_EXT.test(a))
+    .filter((a) => !a.startsWith('-'))
     .map((a) => resolve(cwd, a))
 }
 
@@ -273,9 +308,14 @@ async function flushOpen(): Promise<void> {
   pendingOpen = null
   if (win.isMinimized()) win.restore()
   win.focus()
+
+  // A folder opens the sidebar; a document opens in the editor; anything else is not ours.
+  const info = await stat(path).catch(() => null)
+  if (info?.isDirectory()) return sendToRenderer({ type: 'open-workspace', root: path })
+  if (!MARKDOWN_EXT.test(path)) return
   try {
     const content = await readFile(path, 'utf-8')
-    win.webContents.send('menu:action', { type: 'open-external', path, name: basename(path), content })
+    sendToRenderer({ type: 'open-external', path, name: basename(path), content })
   } catch (err) {
     dialog.showErrorBox('無法開啟檔案', `${path}\n${err instanceof Error ? err.message : String(err)}`)
   }
@@ -350,6 +390,8 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   app.whenReady().then(async () => {
+    await migrateLegacyData()
+    app.setAboutPanelOptions({ applicationName: app.name, applicationVersion: app.getVersion() })
     settings = await loadSettings()
     await saveSettings(settings) // persists a freshly generated token so copied client configs stay valid
     mcp = new McpController(() => settings.mcp, callRenderer)
@@ -368,6 +410,7 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 app.on('before-quit', () => {
+  stopWatching()
   void mcp?.stop()
 })
 
