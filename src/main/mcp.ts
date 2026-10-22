@@ -4,6 +4,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 import { z } from 'zod'
 import type { McpSettings } from './settings'
+import { t } from './i18n'
 
 /** Ask the editor window to do something; resolves with its answer or rejects with its error. */
 export type CallRenderer = (method: string, args?: unknown) => Promise<unknown>
@@ -44,7 +45,7 @@ function buildServer(settings: () => McpSettings, call: CallRenderer): McpServer
     }
   }
   const needsWrite = (): ReturnType<typeof failure> | null =>
-    settings().allowWrite ? null : failure('目前不允許 AI 修改文件。請使用者在選單「AI → 允許 AI 修改文件」開啟後再試。')
+    settings().allowWrite ? null : failure(t('mcp.writeDenied', { menu: `${t('menu.edit')} → ${t('settings.title')} → ${t('settings.tabs.ai')}`, item: t('settings.ai.allowWrite') }))
 
   server.registerTool(
     'get_syntax_guide',
@@ -83,7 +84,7 @@ function buildServer(settings: () => McpSettings, call: CallRenderer): McpServer
     {
       title: '取代文字',
       description:
-        '在文件中把 find 這段文字換成 replace。find 必須與文件內容逐字相同；預設要求只出現一次，出現多次會回傳錯誤與次數，請加長 find 讓它唯一，或設 replaceAll。整個動作在編輯器裡是一次可還原的操作。',
+        '在文件中把 find 這段文字換成 replace。find 必須與文件內容逐字相同；預設要求只出現一次，出現多次會回傳錯誤與次數，請加長 find 讓它唯一，或設 replaceAll。整個動作在編輯器裡是一次可還原的操作。除非使用者開啟「直接寫入」，修改會以差異比較顯示，讓使用者逐行接受或拒絕，所以請讓每次修改專注、範圍小。',
       inputSchema: {
         find: z.string().min(1).describe('要被取代的原文，逐字相同'),
         replace: z.string().describe('取代後的文字，可為空字串（等於刪除）'),
@@ -91,7 +92,7 @@ function buildServer(settings: () => McpSettings, call: CallRenderer): McpServer
       },
       annotations: { destructiveHint: true, idempotentHint: false }
     },
-    async (args) => needsWrite() ?? run('replace_text', args)
+    async (args) => needsWrite() ?? run('replace_text', { ...args, review: !settings().directWrite })
   )
 
   server.registerTool(
@@ -99,14 +100,14 @@ function buildServer(settings: () => McpSettings, call: CallRenderer): McpServer
     {
       title: '插入文字',
       description:
-        '在文件的游標處、開頭或結尾插入文字。整個動作在編輯器裡是一次可還原的操作。區塊（標題、表格、圖表等）前後請自行帶上空行。',
+        '在文件的游標處、開頭或結尾插入文字。整個動作在編輯器裡是一次可還原的操作。區塊（標題、表格、圖表等）前後請自行帶上空行。除非使用者開啟「直接寫入」，修改會以差異比較顯示，讓使用者逐行接受或拒絕。',
       inputSchema: {
         text: z.string().min(1).describe('要插入的文字'),
         position: z.enum(['cursor', 'start', 'end']).describe('插入位置')
       },
       annotations: { destructiveHint: false, idempotentHint: false }
     },
-    async (args) => needsWrite() ?? run('insert_text', args)
+    async (args) => needsWrite() ?? run('insert_text', { ...args, review: !settings().directWrite })
   )
 
   return server

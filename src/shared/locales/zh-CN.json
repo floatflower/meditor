@@ -1,0 +1,229 @@
+{
+  "menu": {
+    "file": "文件",
+    "newFile": "新建文件",
+    "open": "打开…",
+    "openFolder": "打开文件夹…",
+    "closeFolder": "关闭文件夹",
+    "closeTab": "关闭标签页",
+    "save": "保存",
+    "saveAs": "另存为…",
+    "export": "导出",
+    "edit": "编辑",
+    "undo": "撤销",
+    "redo": "重做",
+    "cut": "剪切",
+    "copy": "拷贝",
+    "paste": "粘贴",
+    "pasteMatch": "粘贴并匹配样式",
+    "delete": "删除",
+    "selectAll": "全选",
+    "settings": "设置…",
+    "about": "关于 {{name}}",
+    "services": "服务",
+    "hide": "隐藏 {{name}}",
+    "hideOthers": "隐藏其他",
+    "showAll": "全部显示",
+    "quit": "退出 {{name}}",
+    "view": "视图",
+    "reloadPage": "重新加载页面",
+    "forceReload": "强制重新加载",
+    "devTools": "开发者工具",
+    "actualSize": "实际大小",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "fullScreen": "切换全屏",
+    "window": "窗口",
+    "minimize": "最小化",
+    "zoom": "缩放",
+    "front": "全部置于最前",
+    "closeWindow": "关闭窗口"
+  },
+  "dialog": {
+    "token": {
+      "title": "重新生成连接 token？",
+      "detail": "当前已连接或已配置好的 AI 客户端将失效，需要用新的命令重新配置。",
+      "regenerate": "重新生成",
+      "cancel": "取消",
+      "done": "已重新生成 token"
+    },
+    "openError": "无法打开文件",
+    "defaultApp": {
+      "devNote": "（当前是开发模式，系统并不认识这个可执行文件；请在打包后的 app 上设置。）",
+      "mac": {
+        "message": "在访达中设置默认的 Markdown 程序",
+        "detail": "macOS 不允许 app 自行更改默认程序，请按以下步骤设置：\n\n1. 在访达中选中任意一个 .md 文件\n2. 按 ⌘I 打开“显示简介”\n3. 在“打开方式”中选择“{{name}}”\n4. 点按“全部更改…”并确认{{devNote}}"
+      },
+      "win": {
+        "message": "在 Windows 中设置默认的 Markdown 程序",
+        "detail": "Windows 不允许 app 自行更改默认程序，请按以下步骤设置：\n\n1. 点击下方按钮打开“默认应用”设置\n2. 搜索 .md\n3. 选择“{{name}}”{{devNote}}"
+      },
+      "other": {
+        "message": "设置默认的 Markdown 程序",
+        "detail": "请在文件管理器中右键点击 .md 文件 → 属性 → 打开方式 → 选择“{{name}}”并设为默认。{{devNote}}"
+      },
+      "openSettings": "打开设置",
+      "close": "关闭",
+      "ok": "好"
+    }
+  },
+  "mcp": {
+    "writeDenied": "当前不允许 AI 修改文档。请用户在菜单“{{menu}} → {{item}}”中开启后再试。"
+  },
+  "header": {
+    "h1": "标题 1",
+    "h2": "标题 2",
+    "h3": "标题 3",
+    "bold": "粗体 (⌘B)",
+    "italic": "斜体 (⌘I)",
+    "strike": "删除线",
+    "inlineCode": "行内代码",
+    "ul": "无序列表",
+    "ol": "有序列表",
+    "task": "待办列表",
+    "quote": "引用",
+    "link": "链接",
+    "image": "图片",
+    "codeBlock": "代码块",
+    "table": "表格",
+    "hr": "分隔线",
+    "inlineMath": "行内公式 ($)",
+    "blockMath": "块级公式 ($$)",
+    "chart": "数据图表",
+    "mermaid": "Mermaid 图表",
+    "modeEditor": "编辑模式",
+    "modeSplit": "双栏模式",
+    "modePreview": "预览模式",
+    "sidebar": "侧栏",
+    "sidebarCollapse": "收起侧栏",
+    "sidebarExpand": "展开侧栏",
+    "pluginOff": "{{label}}（对应的插件已停用）"
+  },
+  "tabs": {
+    "label": "打开的文件",
+    "close": "关闭 {{name}}",
+    "closeUnsaved": "关闭 {{name}}（尚未保存）"
+  },
+  "sidebar": {
+    "label": "文件夹",
+    "refresh": "刷新",
+    "close": "关闭文件夹",
+    "empty": "这个文件夹里没有 .md 文件",
+    "truncated": "文件太多，只显示部分",
+    "resize": "调整侧栏宽度",
+    "closeOverlay": "关闭侧栏"
+  },
+  "status": {
+    "saved": "已保存 {{name}}",
+    "exporting": "导出中…",
+    "exported": "已导出 {{kind}}",
+    "exportFailed": "导出失败：{{error}}",
+    "openFolderFailed": "无法打开文件夹：{{error}}",
+    "openFileFailed": "无法打开 {{path}}：{{error}}",
+    "pluginErrors": "插件错误：{{list}}",
+    "listSeparator": "；",
+    "characters": "{{n}} 个字符",
+    "version": "版本 {{version}}",
+    "devBuild": "开发版"
+  },
+  "closeDialog": {
+    "title": "“{{name}}”尚未保存",
+    "description": "要在关闭前保存对这个文件的更改吗？",
+    "cancel": "取消",
+    "discard": "不保存",
+    "save": "保存"
+  },
+  "settings": {
+    "title": "设置",
+    "close": "关闭",
+    "tabs": {
+      "general": "常规",
+      "appearance": "外观",
+      "plugins": "插件",
+      "ai": "AI"
+    },
+    "general": {
+      "language": "语言",
+      "system": "跟随系统",
+      "hint": "立即生效。“跟随系统”会使用你电脑的语言，若不支持则使用英文。",
+      "defaultApp": {
+        "title": "默认的 Markdown 程序",
+        "hint": "双击 .md 文件时用这个程序打开。这由操作系统决定，所以会显示设置步骤。",
+        "button": "设为默认的 Markdown 程序…"
+      }
+    },
+    "appearance": {
+      "builtin": "内置外观",
+      "custom": "自定义外观",
+      "noCustom": "还没有自定义外观。把 .css 文件放进外观文件夹，再点“重新加载”。",
+      "openFolder": "打开外观文件夹",
+      "reload": "重新加载"
+    },
+    "plugins": {
+      "builtin": "内置插件",
+      "custom": "自定义插件",
+      "noCustom": "尚未安装自定义插件",
+      "openFolder": "打开插件文件夹",
+      "reload": "重新加载",
+      "error": "加载失败：{{error}}"
+    },
+    "ai": {
+      "intro": "让 AI 助手（例如 Claude Code）通过 MCP 读取并修改你的文档。服务器只在这台电脑上监听。",
+      "status": {
+        "off": "未启用",
+        "running": "运行中：127.0.0.1:{{port}}",
+        "failed": "无法启动：{{error}}"
+      },
+      "enable": "启用 MCP 服务器",
+      "allowWrite": "允许 AI 修改文档",
+      "allowWriteHint": "没有开启时，AI 只能读取。",
+      "directWrite": "允许 AI 直接写入",
+      "directWriteHint": "跳过逐行审阅：AI 的修改会立即应用，不再以差异对比显示。只有在“允许 AI 修改文档”开启时才有作用。",
+      "connect": "连接 AI",
+      "copyCommand": "复制 Claude Code 连接命令",
+      "copyJson": "复制 MCP 连接配置（JSON）",
+      "copied": "已复制（含 token，请勿公开分享）",
+      "regenerate": "重新生成连接 token…"
+    }
+  },
+  "snippet": {
+    "text": "文字",
+    "linkText": "链接文字",
+    "imageAlt": "图片说明",
+    "column": "列",
+    "cell": "内容",
+    "mermaidStart": "开始",
+    "mermaidEnd": "结束",
+    "chartTitle": "标题",
+    "chartItem": "项目",
+    "chartSeriesA": "系列 A",
+    "chartSeriesB": "系列 B",
+    "chartRow1": "一",
+    "chartRow2": "二",
+    "chartRow3": "三"
+  },
+  "plugins": {
+    "mermaid": "Mermaid 图表",
+    "math": "LaTeX 数学公式",
+    "chart": "图表（Chart.js）",
+    "noDefaultExport": "插件文件没有 default export"
+  },
+  "chart": {
+    "alt": "图表",
+    "noTable": "chart 区块里需要一张 Markdown 表格",
+    "tableTooSmall": "表格至少需要两列（标签＋一组数据）和一行数据",
+    "unsupportedType": "不支持的图表类型“{{type}}”（可用：{{list}}）",
+    "specInvalid": "chart 配置需要 type 和 data（Chart.js 的配置格式，YAML 或 JSON）",
+    "listSeparator": "、"
+  },
+  "review": {
+    "banner": "AI 修改了 {{n}} 行",
+    "acceptAll": "全部接受",
+    "rejectAll": "全部拒绝",
+    "next": "下一处",
+    "prev": "上一处",
+    "acceptLine": "接受这项修改",
+    "rejectLine": "拒绝这项修改",
+    "tab": "{{n}} 处修改待审阅"
+  }
+}

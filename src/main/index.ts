@@ -1,23 +1,26 @@
 import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, shell } from 'electron'
 import { join, basename, resolve } from 'path'
-import { buildMenu, type MenuAction, type MenuActions, type MenuState } from './menu'
+import { buildMenu, type MenuAction, type MenuActions } from './menu'
 import { McpController } from './mcp'
 import { scanFolder, stopWatching, watchFolder } from './folder'
 import { loadSettings, newToken, saveSettings, type Settings } from './settings'
+import { isLanguageSetting, resolveLanguage, type Lang } from '../shared/i18n'
+import type { AiPatch, AiState } from '../shared/ai'
+import { setMainLanguage, t } from './i18n'
 import { access, cp, mkdir, readFile, readdir, stat, writeFile } from 'fs/promises'
 
 const userDir = (sub: string): string => join(app.getPath('userData'), sub)
 
-const EXAMPLE_THEME = `/* 自訂 theme：樣式請寫在 .markdown-body 底下。 */
+const EXAMPLE_THEME = `/* A custom theme: put the rules under .markdown-body. */
 .markdown-body {
   font-family: Georgia, 'Noto Serif TC', serif;
   color: #3b2f2f;
   background: #fbf6ee;
 
-  /* mermaid 圖表配色（用 hex / rgb() / hsl()）。可用變數：
-     primary, primary-text, primary-border, secondary, tertiary, line, text,
-     background, font, node-border, cluster-background, note-background,
-     note-text, note-border, edge-label-background；深色主題另設 --mermaid-dark: true */
+  /* Mermaid diagram colours (hex / rgb() / hsl()). Variables: primary, primary-text,
+     primary-border, secondary, tertiary, line, text, background, font, node-border,
+     cluster-background, note-background, note-text, note-border, edge-label-background;
+     a dark theme also sets --mermaid-dark: true */
   --mermaid-primary: #f1e8d8;
   --mermaid-primary-text: #3b2f2f;
   --mermaid-primary-border: #c9a66b;
@@ -25,8 +28,8 @@ const EXAMPLE_THEME = `/* 自訂 theme：樣式請寫在 .markdown-body 底下�
   --mermaid-text: #3b2f2f;
   --mermaid-font: Georgia, serif;
 
-  /* 資料圖表配色：--chart-1 ~ --chart-8 為各組資料的顏色，另有
-     --chart-text（文字）、--chart-grid（格線）、--chart-font（字型）。沒設就沿用主題文字色。 */
+  /* Chart colours: --chart-1 to --chart-8 colour the data series; --chart-text, --chart-grid
+     and --chart-font are optional (the text colour falls back to the theme's). */
   --chart-1: #9a3412;
   --chart-2: #c9a66b;
   --chart-3: #6b7f3a;
@@ -57,7 +60,6 @@ async function listFiles(dir: string, ext: string): Promise<string[]> {
   return (await readdir(dir)).filter((f) => f.endsWith(ext))
 }
 
-let menuState: MenuState = { themes: [], currentTheme: '', plugins: [] }
 let settings: Settings
 let mcp: McpController
 
@@ -104,79 +106,84 @@ function sendToRenderer(action: MenuAction): void {
   BrowserWindow.getAllWindows()[0]?.webContents.send('menu:action', action)
 }
 
-function notify(text: string): void {
-  sendToRenderer({ type: 'notice', text })
+/** The language the app is actually shown in, given the setting and the computer's own languages. */
+function currentLanguage(): Lang {
+  return resolveLanguage(settings.language, app.getPreferredSystemLanguages())
 }
 
 function rebuildMenu(): void {
-  const { enabled, allowWrite } = settings.mcp
-  Menu.setApplicationMenu(
-    buildMenu(menuState, { enabled, allowWrite, ...mcp.status }, menuActions)
-  )
+  Menu.setApplicationMenu(buildMenu(menuActions))
 }
 
-async function applyMcpSettings(): Promise<void> {
+// --- AI (MCP) settings, driven from the Settings dialog ----------------------------------------
+
+function aiState(): AiState {
+  const { enabled, allowWrite, directWrite } = settings.mcp
+  return { enabled, allowWrite, directWrite, ...mcp.status }
+}
+
+async function setAi(patch: AiPatch): Promise<AiState> {
+  const wasEnabled = settings.mcp.enabled
+  if (typeof patch.enabled === 'boolean') {
+    settings.mcp.enabled = patch.enabled
+    if (!patch.enabled) settings.mcp.allowWrite = false // nothing can be written while the server is off
+  }
+  // Switching write on while the server is off would be a setting that silently does nothing.
+  if (typeof patch.allowWrite === 'boolean' && settings.mcp.enabled) settings.mcp.allowWrite = patch.allowWrite
+  if (typeof patch.directWrite === 'boolean') settings.mcp.directWrite = patch.directWrite
   await saveSettings(settings)
-  if (settings.mcp.enabled) await mcp.start()
-  else await mcp.stop()
-  rebuildMenu()
+
+  // Only turning the server on or off touches the connection; the other switches take effect live.
+  if (settings.mcp.enabled && !wasEnabled) await mcp.start()
+  else if (!settings.mcp.enabled && wasEnabled) await mcp.stop()
+  return aiState()
 }
 
 const menuActions: MenuActions = {
-  setAsDefault: () => void showDefaultAppGuide(),
   openFolder: async () => {
     const r = await dialog.showOpenDialog({ properties: ['openDirectory'] })
     if (!r.canceled && r.filePaths[0]) sendToRenderer({ type: 'open-workspace', root: r.filePaths[0] })
-  },
-  toggleEnabled: (enabled) => {
-    settings.mcp.enabled = enabled
-    if (!enabled) settings.mcp.allowWrite = false
-    void applyMcpSettings()
-  },
-  toggleWrite: (allow) => {
-    settings.mcp.allowWrite = allow
-    void applyMcpSettings()
-  },
-  copyCommand: () => {
-    clipboard.writeText(
-      `claude mcp add --transport http meditor ${mcpUrl()} --header "Authorization: Bearer ${settings.mcp.token}"`
-    )
-    notify('已複製 Claude Code 連線指令（含 token，請勿公開分享）')
-  },
-  copyJson: () => {
-    clipboard.writeText(
-      JSON.stringify(
-        {
-          mcpServers: {
-            meditor: { type: 'http', url: mcpUrl(), headers: { Authorization: `Bearer ${settings.mcp.token}` } }
-          }
-        },
-        null,
-        2
-      )
-    )
-    notify('已複製 MCP 連線設定（含 token，請勿公開分享）')
-  },
-  regenerateToken: async () => {
-    const r = await dialog.showMessageBox({
-      type: 'warning',
-      message: '重新產生連線 token？',
-      detail: '目前已連線或已設定好的 AI 客戶端會失效，需要用新的指令重新設定。',
-      buttons: ['重新產生', '取消'],
-      defaultId: 1,
-      cancelId: 1
-    })
-    if (r.response !== 0) return
-    settings.mcp.token = newToken()
-    await applyMcpSettings()
-    notify('已重新產生 token')
   }
 }
 
 function registerIpc(): void {
-  ipcMain.on('menu:state', (_e, state: MenuState) => {
-    menuState = state
-    rebuildMenu()
+  // The packaged app's version is whatever the build stamped into it: for a release, the git tag.
+  ipcMain.handle('app:info', () => ({
+    version: app.getVersion(),
+    packaged: app.isPackaged,
+    name: app.name,
+    platform: process.platform
+  }))
+  // Only Windows has a settings page to send the user to; macOS and Linux get written steps.
+  ipcMain.handle('app:open-default-apps-settings', () => {
+    if (process.platform === 'win32') return shell.openExternal('ms-settings:defaultapps')
+  })
+
+  ipcMain.handle('ai:get', () => aiState())
+  ipcMain.handle('ai:set', (_e, patch: AiPatch) => setAi(patch ?? {}))
+  ipcMain.handle('ai:copy-command', () => {
+    clipboard.writeText(`claude mcp add --transport http meditor ${mcpUrl()} --header "Authorization: Bearer ${settings.mcp.token}"`)
+  })
+  ipcMain.handle('ai:copy-json', () => {
+    const config = { mcpServers: { meditor: { type: 'http', url: mcpUrl(), headers: { Authorization: `Bearer ${settings.mcp.token}` } } } }
+    clipboard.writeText(JSON.stringify(config, null, 2))
+  })
+  // The window asks the user first; the token is read live, so connected clients are simply refused from now on.
+  ipcMain.handle('ai:regenerate-token', async () => {
+    settings.mcp.token = newToken()
+    await saveSettings(settings)
+  })
+
+  ipcMain.handle('language:get', () => ({ setting: settings.language, resolved: currentLanguage() }))
+
+  ipcMain.handle('language:set', async (_e, setting: unknown) => {
+    if (isLanguageSetting(setting)) {
+      settings.language = setting
+      await saveSettings(settings)
+      setMainLanguage(currentLanguage())
+      rebuildMenu() // the native menu is ours to relabel
+    }
+    return { setting: settings.language, resolved: currentLanguage() }
   })
 
   ipcMain.handle('folder:scan', async (_e, root: string) => {
@@ -317,33 +324,8 @@ async function flushOpen(): Promise<void> {
     const content = await readFile(path, 'utf-8')
     sendToRenderer({ type: 'open-external', path, name: basename(path), content })
   } catch (err) {
-    dialog.showErrorBox('無法開啟檔案', `${path}\n${err instanceof Error ? err.message : String(err)}`)
+    dialog.showErrorBox(t('dialog.openError'), `${path}\n${err instanceof Error ? err.message : String(err)}`)
   }
-}
-
-/**
- * Operating systems do not let an app make itself the default for a file type; the user has to
- * choose it. All the app can do is be eligible (see `fileAssociations` in package.json) and say how.
- */
-async function showDefaultAppGuide(): Promise<void> {
-  const name = app.name
-  const devNote = app.isPackaged ? '' : '\n\n（目前是開發模式，系統並不認得這個執行檔；請在打包後的 app 上設定。）'
-  const mac = {
-    message: '在 Finder 設定預設的 Markdown 程式',
-    detail: `macOS 不允許 app 自行變更預設程式，請依下列步驟設定：\n\n1. 在 Finder 選取任一個 .md 檔案\n2. 按 ⌘I 開啟「取得資訊」\n3. 在「以此 App 打開」選擇「${name}」\n4. 按「全部更改…」並確認${devNote}`
-  }
-  const win = {
-    message: '在 Windows 設定預設的 Markdown 程式',
-    detail: `Windows 不允許 app 自行變更預設程式，請依下列步驟設定：\n\n1. 按下方按鈕開啟「預設應用程式」設定\n2. 搜尋 .md\n3. 選擇「${name}」${devNote}`
-  }
-  const other = {
-    message: '設定預設的 Markdown 程式',
-    detail: `請在檔案管理員對 .md 檔案按右鍵 → 內容 → 以其他應用程式開啟 → 選擇「${name}」並設為預設。${devNote}`
-  }
-  const text = process.platform === 'darwin' ? mac : process.platform === 'win32' ? win : other
-  const buttons = process.platform === 'win32' ? ['開啟設定', '關閉'] : ['好']
-  const r = await dialog.showMessageBox({ type: 'info', ...text, buttons, defaultId: 0 })
-  if (process.platform === 'win32' && r.response === 0) void shell.openExternal('ms-settings:defaultapps')
 }
 
 const devIcon = join(app.getAppPath(), 'build', 'icon.png')
@@ -393,6 +375,7 @@ if (!app.requestSingleInstanceLock()) {
     await migrateLegacyData()
     app.setAboutPanelOptions({ applicationName: app.name, applicationVersion: app.getVersion() })
     settings = await loadSettings()
+    setMainLanguage(currentLanguage())
     await saveSettings(settings) // persists a freshly generated token so copied client configs stay valid
     mcp = new McpController(() => settings.mcp, callRenderer)
     registerIpc()

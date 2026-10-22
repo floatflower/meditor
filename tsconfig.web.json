@@ -6,9 +6,10 @@
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "strict": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "paths": { "@/*": ["./src/renderer/src/*"] }
   },
-  "include": ["src/renderer/src/**/*", "src/preload/index.d.ts", "src/main/menu.ts", "src/main/folder.ts"]
+  "include": ["src/shared/**/*", "src/renderer/src/**/*", "src/preload/index.d.ts", "src/main/menu.ts", "src/main/folder.ts", "src/main/i18n.ts"]
 }

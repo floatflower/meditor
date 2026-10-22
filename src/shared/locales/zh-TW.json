@@ -1,0 +1,229 @@
+{
+  "menu": {
+    "file": "檔案",
+    "newFile": "開新檔案",
+    "open": "開啟…",
+    "openFolder": "開啟資料夾…",
+    "closeFolder": "關閉資料夾",
+    "closeTab": "關閉分頁",
+    "save": "儲存",
+    "saveAs": "另存新檔…",
+    "export": "匯出",
+    "edit": "編輯",
+    "undo": "還原",
+    "redo": "重做",
+    "cut": "剪下",
+    "copy": "拷貝",
+    "paste": "貼上",
+    "pasteMatch": "貼上並符合樣式",
+    "delete": "刪除",
+    "selectAll": "全選",
+    "settings": "設定…",
+    "about": "關於 {{name}}",
+    "services": "服務",
+    "hide": "隱藏 {{name}}",
+    "hideOthers": "隱藏其他",
+    "showAll": "全部顯示",
+    "quit": "結束 {{name}}",
+    "view": "檢視",
+    "reloadPage": "重新載入頁面",
+    "forceReload": "強制重新載入",
+    "devTools": "開發者工具",
+    "actualSize": "實際大小",
+    "zoomIn": "放大",
+    "zoomOut": "縮小",
+    "fullScreen": "切換全螢幕",
+    "window": "視窗",
+    "minimize": "最小化",
+    "zoom": "縮放",
+    "front": "全部移至最上層",
+    "closeWindow": "關閉視窗"
+  },
+  "dialog": {
+    "token": {
+      "title": "重新產生連線 token？",
+      "detail": "目前已連線或已設定好的 AI 客戶端會失效，需要用新的指令重新設定。",
+      "regenerate": "重新產生",
+      "cancel": "取消",
+      "done": "已重新產生 token"
+    },
+    "openError": "無法開啟檔案",
+    "defaultApp": {
+      "devNote": "（目前是開發模式，系統並不認得這個執行檔；請在打包後的 app 上設定。）",
+      "mac": {
+        "message": "在 Finder 設定預設的 Markdown 程式",
+        "detail": "macOS 不允許 app 自行變更預設程式，請依下列步驟設定：\n\n1. 在 Finder 選取任一個 .md 檔案\n2. 按 ⌘I 開啟「取得資訊」\n3. 在「以此 App 打開」選擇「{{name}}」\n4. 按「全部更改…」並確認{{devNote}}"
+      },
+      "win": {
+        "message": "在 Windows 設定預設的 Markdown 程式",
+        "detail": "Windows 不允許 app 自行變更預設程式，請依下列步驟設定：\n\n1. 按下方按鈕開啟「預設應用程式」設定\n2. 搜尋 .md\n3. 選擇「{{name}}」{{devNote}}"
+      },
+      "other": {
+        "message": "設定預設的 Markdown 程式",
+        "detail": "請在檔案管理員對 .md 檔案按右鍵 → 內容 → 以其他應用程式開啟 → 選擇「{{name}}」並設為預設。{{devNote}}"
+      },
+      "openSettings": "開啟設定",
+      "close": "關閉",
+      "ok": "好"
+    }
+  },
+  "mcp": {
+    "writeDenied": "目前不允許 AI 修改文件。請使用者在選單「{{menu}} → {{item}}」開啟後再試。"
+  },
+  "header": {
+    "h1": "標題 1",
+    "h2": "標題 2",
+    "h3": "標題 3",
+    "bold": "粗體 (⌘B)",
+    "italic": "斜體 (⌘I)",
+    "strike": "刪除線",
+    "inlineCode": "行內程式碼",
+    "ul": "無序清單",
+    "ol": "有序清單",
+    "task": "待辦清單",
+    "quote": "引用",
+    "link": "連結",
+    "image": "圖片",
+    "codeBlock": "程式碼區塊",
+    "table": "表格",
+    "hr": "分隔線",
+    "inlineMath": "行內公式 ($)",
+    "blockMath": "區塊公式 ($$)",
+    "chart": "資料圖表",
+    "mermaid": "Mermaid 圖表",
+    "modeEditor": "編輯模式",
+    "modeSplit": "雙欄模式",
+    "modePreview": "預覽模式",
+    "sidebar": "側欄",
+    "sidebarCollapse": "收合側欄",
+    "sidebarExpand": "展開側欄",
+    "pluginOff": "{{label}}（對應的插件已停用）"
+  },
+  "tabs": {
+    "label": "開啟的檔案",
+    "close": "關閉 {{name}}",
+    "closeUnsaved": "關閉 {{name}}（尚未儲存）"
+  },
+  "sidebar": {
+    "label": "資料夾",
+    "refresh": "重新整理",
+    "close": "關閉資料夾",
+    "empty": "這個資料夾裡沒有 .md 檔案",
+    "truncated": "檔案太多，只顯示部分",
+    "resize": "調整側欄寬度",
+    "closeOverlay": "關閉側欄"
+  },
+  "status": {
+    "saved": "已儲存 {{name}}",
+    "exporting": "匯出中…",
+    "exported": "已匯出 {{kind}}",
+    "exportFailed": "匯出失敗：{{error}}",
+    "openFolderFailed": "無法開啟資料夾：{{error}}",
+    "openFileFailed": "無法開啟 {{path}}：{{error}}",
+    "pluginErrors": "Plugin 錯誤：{{list}}",
+    "listSeparator": "；",
+    "characters": "{{n}} 字元",
+    "version": "版本 {{version}}",
+    "devBuild": "開發版"
+  },
+  "closeDialog": {
+    "title": "「{{name}}」尚未儲存",
+    "description": "要在關閉前儲存對這個檔案的變更嗎？",
+    "cancel": "取消",
+    "discard": "不儲存",
+    "save": "儲存"
+  },
+  "settings": {
+    "title": "設定",
+    "close": "關閉",
+    "tabs": {
+      "general": "一般",
+      "appearance": "外觀",
+      "plugins": "插件",
+      "ai": "AI"
+    },
+    "general": {
+      "language": "語言",
+      "system": "跟隨系統",
+      "hint": "立即生效。「跟隨系統」會使用你電腦的語言，若不支援則使用英文。",
+      "defaultApp": {
+        "title": "預設的 Markdown 程式",
+        "hint": "雙擊 .md 檔案時用這個程式開啟。這由作業系統決定，所以會顯示設定的步驟。",
+        "button": "設為預設的 Markdown 程式…"
+      }
+    },
+    "appearance": {
+      "builtin": "內建外觀",
+      "custom": "自訂外觀",
+      "noCustom": "還沒有自訂外觀。把 .css 檔案放進外觀資料夾，再按「重新載入」。",
+      "openFolder": "開啟外觀資料夾",
+      "reload": "重新載入"
+    },
+    "plugins": {
+      "builtin": "內建插件",
+      "custom": "自訂插件",
+      "noCustom": "尚未安裝自訂插件",
+      "openFolder": "開啟插件資料夾",
+      "reload": "重新載入",
+      "error": "載入失敗：{{error}}"
+    },
+    "ai": {
+      "intro": "讓 AI 助理（例如 Claude Code）透過 MCP 讀取並修改你的文件。伺服器只在這台電腦上監聽。",
+      "status": {
+        "off": "未啟用",
+        "running": "執行中：127.0.0.1:{{port}}",
+        "failed": "無法啟動：{{error}}"
+      },
+      "enable": "啟用 MCP 伺服器",
+      "allowWrite": "允許 AI 修改文件",
+      "allowWriteHint": "沒有開啟時，AI 只能讀取。",
+      "directWrite": "允許 AI 直接寫入",
+      "directWriteHint": "略過逐行審閱：AI 的修改會立即套用，不再以差異比較顯示。只有在「允許 AI 修改文件」開啟時才有作用。",
+      "connect": "連接 AI",
+      "copyCommand": "複製 Claude Code 連線指令",
+      "copyJson": "複製 MCP 連線設定（JSON）",
+      "copied": "已複製（含 token，請勿公開分享）",
+      "regenerate": "重新產生連線 token…"
+    }
+  },
+  "snippet": {
+    "text": "文字",
+    "linkText": "連結文字",
+    "imageAlt": "圖片說明",
+    "column": "欄位",
+    "cell": "內容",
+    "mermaidStart": "開始",
+    "mermaidEnd": "結束",
+    "chartTitle": "標題",
+    "chartItem": "項目",
+    "chartSeriesA": "系列 A",
+    "chartSeriesB": "系列 B",
+    "chartRow1": "一",
+    "chartRow2": "二",
+    "chartRow3": "三"
+  },
+  "plugins": {
+    "mermaid": "Mermaid 圖表",
+    "math": "LaTeX 數學公式",
+    "chart": "圖表（Chart.js）",
+    "noDefaultExport": "plugin 檔案沒有 default export"
+  },
+  "chart": {
+    "alt": "圖表",
+    "noTable": "chart 區塊裡需要一張 Markdown 表格",
+    "tableTooSmall": "表格至少需要兩欄（標籤＋一組資料）與一列資料",
+    "unsupportedType": "不支援的圖表類型「{{type}}」（可用：{{list}}）",
+    "specInvalid": "chart 設定需要 type 與 data（Chart.js 的設定格式，YAML 或 JSON）",
+    "listSeparator": "、"
+  },
+  "review": {
+    "banner": "AI 修改了 {{n}} 行",
+    "acceptAll": "全部接受",
+    "rejectAll": "全部拒絕",
+    "next": "下一處",
+    "prev": "上一處",
+    "acceptLine": "接受這項修改",
+    "rejectLine": "拒絕這項修改",
+    "tab": "{{n}} 處修改待審閱"
+  }
+}

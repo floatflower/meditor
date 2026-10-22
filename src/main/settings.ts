@@ -2,12 +2,15 @@ import { app } from 'electron'
 import { randomBytes } from 'crypto'
 import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
+import { isLanguageSetting, type LanguageSetting } from '../shared/i18n'
 
 export interface McpSettings {
   /** The server only listens while this is on. Off by default. */
   enabled: boolean
   /** Without this the AI can read the document but not change it. */
   allowWrite: boolean
+  /** Skip the diff review: the AI's edits are applied straight away. Only matters while `allowWrite` is on. */
+  directWrite: boolean
   /** Bearer token clients must send. Stable across restarts so client configs keep working. */
   token: string
   port: number
@@ -15,6 +18,8 @@ export interface McpSettings {
 
 export interface Settings {
   mcp: McpSettings
+  /** `system` follows the computer's language; anything it does not support falls back to English. */
+  language: LanguageSetting
 }
 
 export const newToken = (): string => randomBytes(24).toString('hex')
@@ -28,9 +33,9 @@ export async function loadSettings(): Promise<Settings> {
   } catch {
     /* first run, or an unreadable file: fall back to the defaults */
   }
-  const mcp = { enabled: false, allowWrite: false, token: '', port: 39217, ...saved.mcp }
+  const mcp = { enabled: false, allowWrite: false, directWrite: false, token: '', port: 39217, ...saved.mcp }
   if (!mcp.token) mcp.token = newToken()
-  return { mcp }
+  return { mcp, language: isLanguageSetting(saved.language) ? saved.language : 'system' }
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {

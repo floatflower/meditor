@@ -1,0 +1,229 @@
+{
+  "menu": {
+    "file": "File",
+    "newFile": "New File",
+    "open": "Open…",
+    "openFolder": "Open Folder…",
+    "closeFolder": "Close Folder",
+    "closeTab": "Close Tab",
+    "save": "Save",
+    "saveAs": "Save As…",
+    "export": "Export",
+    "edit": "Edit",
+    "undo": "Undo",
+    "redo": "Redo",
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "pasteMatch": "Paste and Match Style",
+    "delete": "Delete",
+    "selectAll": "Select All",
+    "settings": "Settings…",
+    "about": "About {{name}}",
+    "services": "Services",
+    "hide": "Hide {{name}}",
+    "hideOthers": "Hide Others",
+    "showAll": "Show All",
+    "quit": "Quit {{name}}",
+    "view": "View",
+    "reloadPage": "Reload Page",
+    "forceReload": "Force Reload",
+    "devTools": "Developer Tools",
+    "actualSize": "Actual Size",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fullScreen": "Toggle Full Screen",
+    "window": "Window",
+    "minimize": "Minimize",
+    "zoom": "Zoom",
+    "front": "Bring All to Front",
+    "closeWindow": "Close Window"
+  },
+  "dialog": {
+    "token": {
+      "title": "Regenerate the connection token?",
+      "detail": "AI clients that are connected or already set up will stop working and need to be configured again with the new command.",
+      "regenerate": "Regenerate",
+      "cancel": "Cancel",
+      "done": "Connection token regenerated"
+    },
+    "openError": "Could not open the file",
+    "defaultApp": {
+      "devNote": "(Running in development mode, so the system does not recognise this executable. Set it up on the packaged app.)",
+      "mac": {
+        "message": "Set the default Markdown app in Finder",
+        "detail": "macOS does not let an app change the default itself. Please follow these steps:\n\n1. Select any .md file in Finder\n2. Press ⌘I to open Get Info\n3. Under “Open with”, choose “{{name}}”\n4. Click “Change All…” and confirm{{devNote}}"
+      },
+      "win": {
+        "message": "Set the default Markdown app in Windows",
+        "detail": "Windows does not let an app change the default itself. Please follow these steps:\n\n1. Click the button below to open the Default apps settings\n2. Search for .md\n3. Choose “{{name}}”{{devNote}}"
+      },
+      "other": {
+        "message": "Set the default Markdown app",
+        "detail": "In your file manager, right-click any .md file → Properties → Open with → choose “{{name}}” and set it as the default.{{devNote}}"
+      },
+      "openSettings": "Open Settings",
+      "close": "Close",
+      "ok": "OK"
+    }
+  },
+  "mcp": {
+    "writeDenied": "AI is not allowed to edit documents right now. Ask the user to turn on “{{menu}} → {{item}}” and try again."
+  },
+  "header": {
+    "h1": "Heading 1",
+    "h2": "Heading 2",
+    "h3": "Heading 3",
+    "bold": "Bold (⌘B)",
+    "italic": "Italic (⌘I)",
+    "strike": "Strikethrough",
+    "inlineCode": "Inline code",
+    "ul": "Bulleted list",
+    "ol": "Numbered list",
+    "task": "Task list",
+    "quote": "Quote",
+    "link": "Link",
+    "image": "Image",
+    "codeBlock": "Code block",
+    "table": "Table",
+    "hr": "Divider",
+    "inlineMath": "Inline math ($)",
+    "blockMath": "Block math ($$)",
+    "chart": "Chart",
+    "mermaid": "Mermaid diagram",
+    "modeEditor": "Editor only",
+    "modeSplit": "Split view",
+    "modePreview": "Preview only",
+    "sidebar": "Sidebar",
+    "sidebarCollapse": "Collapse sidebar",
+    "sidebarExpand": "Expand sidebar",
+    "pluginOff": "{{label}} (the plugin is turned off)"
+  },
+  "tabs": {
+    "label": "Open files",
+    "close": "Close {{name}}",
+    "closeUnsaved": "Close {{name}} (unsaved)"
+  },
+  "sidebar": {
+    "label": "Folder",
+    "refresh": "Refresh",
+    "close": "Close folder",
+    "empty": "No .md files in this folder",
+    "truncated": "Too many files, showing only some",
+    "resize": "Resize sidebar",
+    "closeOverlay": "Close sidebar"
+  },
+  "status": {
+    "saved": "Saved {{name}}",
+    "exporting": "Exporting…",
+    "exported": "Exported {{kind}}",
+    "exportFailed": "Export failed: {{error}}",
+    "openFolderFailed": "Could not open the folder: {{error}}",
+    "openFileFailed": "Could not open {{path}}: {{error}}",
+    "pluginErrors": "Plugin errors: {{list}}",
+    "listSeparator": "; ",
+    "characters": "{{n}} characters",
+    "version": "Version {{version}}",
+    "devBuild": "development build"
+  },
+  "closeDialog": {
+    "title": "“{{name}}” isn’t saved",
+    "description": "Save your changes to this file before closing?",
+    "cancel": "Cancel",
+    "discard": "Don’t Save",
+    "save": "Save"
+  },
+  "settings": {
+    "title": "Settings",
+    "close": "Close",
+    "tabs": {
+      "general": "General",
+      "appearance": "Appearance",
+      "plugins": "Plugins",
+      "ai": "AI"
+    },
+    "general": {
+      "language": "Language",
+      "system": "System default",
+      "hint": "Applies immediately. “System default” follows your computer’s language and falls back to English when that language isn’t supported.",
+      "defaultApp": {
+        "title": "Default Markdown app",
+        "hint": "Open .md files in this app when you double-click them. The operating system decides this, so you will be shown how to set it.",
+        "button": "Set as default Markdown app…"
+      }
+    },
+    "appearance": {
+      "builtin": "Built-in themes",
+      "custom": "Custom themes",
+      "noCustom": "No custom themes yet. Put a .css file in the themes folder, then reload.",
+      "openFolder": "Open themes folder",
+      "reload": "Reload"
+    },
+    "plugins": {
+      "builtin": "Built-in plugins",
+      "custom": "Custom plugins",
+      "noCustom": "No custom plugins installed",
+      "openFolder": "Open plugins folder",
+      "reload": "Reload",
+      "error": "Failed to load: {{error}}"
+    },
+    "ai": {
+      "intro": "Let an AI assistant (such as Claude Code) read and edit your documents through MCP. The server only listens on this computer.",
+      "status": {
+        "off": "Off",
+        "running": "Running: 127.0.0.1:{{port}}",
+        "failed": "Could not start: {{error}}"
+      },
+      "enable": "Enable MCP server",
+      "allowWrite": "Allow AI to edit documents",
+      "allowWriteHint": "When off, the AI can only read.",
+      "directWrite": "Allow AI to write directly",
+      "directWriteHint": "Skips the line-by-line review: changes the AI makes are applied at once instead of being shown as a diff. Only takes effect while “Allow AI to edit documents” is on.",
+      "connect": "Connect an AI",
+      "copyCommand": "Copy Claude Code command",
+      "copyJson": "Copy MCP config (JSON)",
+      "copied": "Copied (it contains the token — don’t share it)",
+      "regenerate": "Regenerate token…"
+    }
+  },
+  "snippet": {
+    "text": "text",
+    "linkText": "link text",
+    "imageAlt": "image description",
+    "column": "Column",
+    "cell": "Content",
+    "mermaidStart": "Start",
+    "mermaidEnd": "End",
+    "chartTitle": "Title",
+    "chartItem": "Item",
+    "chartSeriesA": "Series A",
+    "chartSeriesB": "Series B",
+    "chartRow1": "One",
+    "chartRow2": "Two",
+    "chartRow3": "Three"
+  },
+  "plugins": {
+    "mermaid": "Mermaid diagrams",
+    "math": "LaTeX math",
+    "chart": "Charts (Chart.js)",
+    "noDefaultExport": "The plugin file has no default export"
+  },
+  "chart": {
+    "alt": "Chart",
+    "noTable": "A chart block needs a Markdown table",
+    "tableTooSmall": "The table needs at least two columns (labels + one series) and one row of data",
+    "unsupportedType": "Unsupported chart type “{{type}}” (available: {{list}})",
+    "specInvalid": "A chart config needs type and data (Chart.js format, YAML or JSON)",
+    "listSeparator": ", "
+  },
+  "review": {
+    "banner": "AI changed {{n}} lines",
+    "acceptAll": "Accept all",
+    "rejectAll": "Reject all",
+    "next": "Next change",
+    "prev": "Previous change",
+    "acceptLine": "Accept this change",
+    "rejectLine": "Reject this change",
+    "tab": "{{n}} changes awaiting review"
+  }
+}

@@ -38,7 +38,11 @@ jobs:
           - name: macos
             os: macos-latest
             # One arm64 runner builds both architectures; the app has no native modules.
-            args: --mac --x64 --arm64
+            # `identity=-` signs ad hoc (no certificate needed). Without it the app keeps Electron's
+            # original signature, which stops matching once the app is renamed and repackaged, and
+            # macOS then reports a downloaded copy as "damaged". Hardened runtime is only needed for
+            # notarization, and combined with an ad-hoc signature it can stop the app from launching.
+            args: --mac --x64 --arm64 --config.mac.identity=- --config.mac.hardenedRuntime=false
             files: release/*.dmg
           - name: windows
             os: windows-latest

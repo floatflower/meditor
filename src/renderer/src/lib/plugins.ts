@@ -1,5 +1,6 @@
 import type { MdPlugin } from './markdown'
 import { builtinPlugins } from '@/builtin'
+import { i18n } from '@/i18n'
 
 export interface PluginEntry {
   /** Stable id used to remember the enabled state: the file name, or `builtin:<name>`. */
@@ -35,7 +36,7 @@ export async function loadPlugins(disabled: ReadonlySet<string>): Promise<Plugin
     try {
       const mod = await import(/* @vite-ignore */ url)
       const plugin = mod.default as MdPlugin | undefined
-      if (!plugin || typeof plugin !== 'object') throw new Error('沒有 default export 的 plugin 物件')
+      if (!plugin || typeof plugin !== 'object') throw new Error(i18n.t('plugins.noDefaultExport'))
       entries.push({ file, name, enabled: true, plugin: { ...plugin, name: plugin.name ?? file } })
     } catch (err) {
       entries.push({ file, name, enabled: true, error: err instanceof Error ? err.message : String(err) })

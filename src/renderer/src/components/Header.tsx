@@ -25,6 +25,7 @@ import {
   Workflow,
   type LucideIcon
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -49,6 +50,7 @@ export type ViewMode = 'editor' | 'split' | 'preview'
 
 interface Action {
   icon: LucideIcon
+  /** Translation key of the tooltip. */
   label: string
   command: EditorCommand
   /** Built-in plugin id that must be enabled for this action to make sense. */
@@ -57,39 +59,39 @@ interface Action {
 
 const GROUPS: Action[][] = [
   [
-    { icon: Heading1, label: '標題 1', command: heading(1) },
-    { icon: Heading2, label: '標題 2', command: heading(2) },
-    { icon: Heading3, label: '標題 3', command: heading(3) }
+    { icon: Heading1, label: 'header.h1', command: heading(1) },
+    { icon: Heading2, label: 'header.h2', command: heading(2) },
+    { icon: Heading3, label: 'header.h3', command: heading(3) }
   ],
   [
-    { icon: Bold, label: '粗體 (⌘B)', command: wrap('**') },
-    { icon: Italic, label: '斜體 (⌘I)', command: wrap('*') },
-    { icon: Strikethrough, label: '刪除線', command: wrap('~~') },
-    { icon: Code, label: '行內程式碼', command: wrap('`', '`', 'code') }
+    { icon: Bold, label: 'header.bold', command: wrap('**') },
+    { icon: Italic, label: 'header.italic', command: wrap('*') },
+    { icon: Strikethrough, label: 'header.strike', command: wrap('~~') },
+    { icon: Code, label: 'header.inlineCode', command: wrap('`', '`', 'code') }
   ],
   [
-    { icon: List, label: '無序清單', command: toggleList('ul') },
-    { icon: ListOrdered, label: '有序清單', command: toggleList('ol') },
-    { icon: ListChecks, label: '待辦清單', command: toggleList('task') },
-    { icon: Quote, label: '引用', command: toggleList('quote') }
+    { icon: List, label: 'header.ul', command: toggleList('ul') },
+    { icon: ListOrdered, label: 'header.ol', command: toggleList('ol') },
+    { icon: ListChecks, label: 'header.task', command: toggleList('task') },
+    { icon: Quote, label: 'header.quote', command: toggleList('quote') }
   ],
   [
-    { icon: Link, label: '連結', command: link },
-    { icon: Image, label: '圖片', command: image },
-    { icon: FileCode, label: '程式碼區塊', command: codeBlock },
-    { icon: Table, label: '表格', command: table },
-    { icon: Minus, label: '分隔線', command: horizontalRule },
-    { icon: Sigma, label: '行內公式 ($)', command: inlineMath, requires: 'builtin:math' },
-    { icon: SquareSigma, label: '區塊公式 ($$)', command: mathBlock, requires: 'builtin:math' },
-    { icon: ChartColumn, label: '資料圖表', command: chartBlock, requires: 'builtin:chart' },
-    { icon: Workflow, label: 'Mermaid 圖表', command: mermaidBlock, requires: 'builtin:mermaid' }
+    { icon: Link, label: 'header.link', command: link },
+    { icon: Image, label: 'header.image', command: image },
+    { icon: FileCode, label: 'header.codeBlock', command: codeBlock },
+    { icon: Table, label: 'header.table', command: table },
+    { icon: Minus, label: 'header.hr', command: horizontalRule },
+    { icon: Sigma, label: 'header.inlineMath', command: inlineMath, requires: 'builtin:math' },
+    { icon: SquareSigma, label: 'header.blockMath', command: mathBlock, requires: 'builtin:math' },
+    { icon: ChartColumn, label: 'header.chart', command: chartBlock, requires: 'builtin:chart' },
+    { icon: Workflow, label: 'header.mermaid', command: mermaidBlock, requires: 'builtin:mermaid' }
   ]
 ]
 
 const MODES: { mode: ViewMode; icon: LucideIcon; label: string }[] = [
-  { mode: 'editor', icon: PencilLine, label: '編輯模式' },
-  { mode: 'split', icon: Columns2, label: '雙欄模式' },
-  { mode: 'preview', icon: Eye, label: '預覽模式' }
+  { mode: 'editor', icon: PencilLine, label: 'header.modeEditor' },
+  { mode: 'split', icon: Columns2, label: 'header.modeSplit' },
+  { mode: 'preview', icon: Eye, label: 'header.modePreview' }
 ]
 
 interface Props {
@@ -103,6 +105,7 @@ interface Props {
 }
 
 export default function Header({ mode, onModeChange, onCommand, enabledPlugins, sidebar }: Props): React.JSX.Element {
+  const { t } = useTranslation()
   const editing = mode !== 'preview'
 
   return (
@@ -115,14 +118,14 @@ export default function Header({ mode, onModeChange, onCommand, enabledPlugins, 
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  aria-label="側欄"
+                  aria-label={t('header.sidebar')}
                   aria-expanded={sidebar.open}
                   onClick={sidebar.onToggle}
                 >
                   <Menu />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{sidebar.open ? '收合側欄' : '展開側欄'}</TooltipContent>
+              <TooltipContent>{sidebar.open ? t('header.sidebarCollapse') : t('header.sidebarExpand')}</TooltipContent>
             </Tooltip>
             <Separator orientation="vertical" className="mx-1 h-5" />
           </>
@@ -130,10 +133,11 @@ export default function Header({ mode, onModeChange, onCommand, enabledPlugins, 
         {GROUPS.map((group, i) => (
           <div key={i} className="flex items-center gap-0.5">
             {i > 0 && <Separator orientation="vertical" className="mx-1 h-5" />}
-            {group.map(({ icon: Icon, label, command, requires }) => {
+            {group.map(({ icon: Icon, label: labelKey, command, requires }) => {
+              const label = t(labelKey)
               const available = !requires || enabledPlugins.has(requires)
               return (
-              <Tooltip key={label}>
+              <Tooltip key={labelKey}>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
@@ -147,7 +151,7 @@ export default function Header({ mode, onModeChange, onCommand, enabledPlugins, 
                     <Icon />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{available ? label : `${label}（對應的插件已停用）`}</TooltipContent>
+                <TooltipContent>{available ? label : t('header.pluginOff', { label })}</TooltipContent>
               </Tooltip>
               )
             })}
@@ -156,13 +160,13 @@ export default function Header({ mode, onModeChange, onCommand, enabledPlugins, 
       </div>
 
       <div className="flex items-center gap-0.5 rounded-md border p-0.5">
-        {MODES.map(({ mode: m, icon: Icon, label }) => (
+        {MODES.map(({ mode: m, icon: Icon, label: labelKey }) => (
           <Tooltip key={m}>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon-sm"
-                aria-label={label}
+                aria-label={t(labelKey)}
                 aria-pressed={mode === m}
                 className={cn(mode === m && 'bg-accent text-accent-foreground')}
                 onClick={() => onModeChange(m)}
@@ -170,7 +174,7 @@ export default function Header({ mode, onModeChange, onCommand, enabledPlugins, 
                 <Icon />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>{label}</TooltipContent>
+            <TooltipContent>{t(labelKey)}</TooltipContent>
           </Tooltip>
         ))}
       </div>

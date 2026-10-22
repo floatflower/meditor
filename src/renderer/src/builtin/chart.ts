@@ -4,6 +4,7 @@ import { parse as parseYaml } from 'yaml'
 import type { ChartConfiguration, ChartType } from 'chart.js'
 import type { MdPlugin } from '@/lib/markdown'
 import { probeTheme } from '@/lib/themeProbe'
+import { i18n } from '@/i18n'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyNode = any
@@ -77,11 +78,11 @@ type Attrs = Record<string, string>
 
 function readTable(el: HTMLElement): { header: string[]; rows: string[][] } {
   const table = el.querySelector('table')
-  if (!table) throw new Error('chart 區塊裡需要一張 Markdown 表格')
+  if (!table) throw new Error(i18n.t('chart.noTable'))
   const text = (c: Element): string => c.textContent?.trim() ?? ''
   const header = Array.from(table.querySelectorAll('thead th')).map(text)
   const rows = Array.from(table.querySelectorAll('tbody tr')).map((tr) => Array.from(tr.children).map(text))
-  if (header.length < 2 || rows.length === 0) throw new Error('表格至少需要兩欄（標籤＋一組資料）與一列資料')
+  if (header.length < 2 || rows.length === 0) throw new Error(i18n.t('chart.tableTooSmall'))
   return { header, rows }
 }
 
@@ -93,7 +94,7 @@ function configFromTable(
   theme: ChartTheme
 ): ChartConfiguration {
   const requested = (attrs.type ?? 'bar').toLowerCase()
-  if (!KINDS.includes(requested)) throw new Error(`不支援的圖表類型「${requested}」（可用：${KINDS.join('、')}）`)
+  if (!KINDS.includes(requested)) throw new Error(i18n.t('chart.unsupportedType', { type: requested, list: KINDS.join(i18n.t('chart.listSeparator')) }))
   const area = requested === 'area'
   const type = (area ? 'line' : requested) as ChartType
   const round = type === 'pie' || type === 'doughnut'
@@ -144,7 +145,7 @@ function configFromTable(
 function configFromSpec(text: string, theme: ChartTheme): { config: ChartConfiguration; width: number; height: number } {
   const spec = parseYaml(text)
   if (!spec || typeof spec !== 'object' || !spec.type || !spec.data) {
-    throw new Error('chart 設定需要 type 與 data（Chart.js 的設定格式，YAML 或 JSON）')
+    throw new Error(i18n.t('chart.specInvalid'))
   }
   const { width, height, ...config } = spec as Record<string, unknown> & { width?: number; height?: number }
   const round = config.type === 'pie' || config.type === 'doughnut'
@@ -218,7 +219,7 @@ async function renderCharts(root: HTMLElement, themeCss: string): Promise<void> 
       img.src = await draw(config, width, height, theme)
       img.width = width
       img.height = height
-      img.alt = title || '圖表'
+      img.alt = title || i18n.t('chart.alt')
       el.replaceChildren(img)
     } catch (err) {
       el.dataset.source = ((el.dataset.chart ? `${el.dataset.chart}\n` : '') + (el.textContent ?? ''))

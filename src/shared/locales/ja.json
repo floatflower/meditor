@@ -1,0 +1,229 @@
+{
+  "menu": {
+    "file": "ファイル",
+    "newFile": "新規ファイル",
+    "open": "開く…",
+    "openFolder": "フォルダを開く…",
+    "closeFolder": "フォルダを閉じる",
+    "closeTab": "タブを閉じる",
+    "save": "保存",
+    "saveAs": "名前を付けて保存…",
+    "export": "書き出し",
+    "edit": "編集",
+    "undo": "取り消す",
+    "redo": "やり直す",
+    "cut": "切り取り",
+    "copy": "コピー",
+    "paste": "貼り付け",
+    "pasteMatch": "貼り付けてスタイルを合わせる",
+    "delete": "削除",
+    "selectAll": "すべてを選択",
+    "settings": "設定…",
+    "about": "{{name}}について",
+    "services": "サービス",
+    "hide": "{{name}}を隠す",
+    "hideOthers": "ほかを隠す",
+    "showAll": "すべてを表示",
+    "quit": "{{name}}を終了",
+    "view": "表示",
+    "reloadPage": "ページを再読み込み",
+    "forceReload": "強制的に再読み込み",
+    "devTools": "開発者ツール",
+    "actualSize": "実際のサイズ",
+    "zoomIn": "拡大",
+    "zoomOut": "縮小",
+    "fullScreen": "フルスクリーンを切り替え",
+    "window": "ウインドウ",
+    "minimize": "最小化",
+    "zoom": "ズーム",
+    "front": "すべてを手前に移動",
+    "closeWindow": "ウインドウを閉じる"
+  },
+  "dialog": {
+    "token": {
+      "title": "接続トークンを再生成しますか？",
+      "detail": "接続中、または設定済みの AI クライアントは使えなくなり、新しいコマンドで設定し直す必要があります。",
+      "regenerate": "再生成",
+      "cancel": "キャンセル",
+      "done": "接続トークンを再生成しました"
+    },
+    "openError": "ファイルを開けません",
+    "defaultApp": {
+      "devNote": "（現在は開発モードのため、システムはこの実行ファイルを認識しません。パッケージ化したアプリで設定してください。）",
+      "mac": {
+        "message": "Finder で既定の Markdown アプリを設定する",
+        "detail": "macOS ではアプリが自分で既定のアプリを変更することはできません。次の手順で設定してください：\n\n1. Finder で任意の .md ファイルを選択\n2. ⌘I を押して「情報を見る」を開く\n3. 「このアプリケーションで開く」で「{{name}}」を選択\n4. 「すべてを変更…」をクリックして確定{{devNote}}"
+      },
+      "win": {
+        "message": "Windows で既定の Markdown アプリを設定する",
+        "detail": "Windows ではアプリが自分で既定のアプリを変更することはできません。次の手順で設定してください：\n\n1. 下のボタンで「既定のアプリ」設定を開く\n2. .md を検索\n3. 「{{name}}」を選択{{devNote}}"
+      },
+      "other": {
+        "message": "既定の Markdown アプリを設定する",
+        "detail": "ファイルマネージャーで .md ファイルを右クリック → プロパティ → 別のアプリで開く →「{{name}}」を選び、既定に設定してください。{{devNote}}"
+      },
+      "openSettings": "設定を開く",
+      "close": "閉じる",
+      "ok": "OK"
+    }
+  },
+  "mcp": {
+    "writeDenied": "現在、AI によるドキュメントの編集は許可されていません。ユーザーにメニューの「{{menu}} → {{item}}」を有効にしてもらってから、もう一度お試しください。"
+  },
+  "header": {
+    "h1": "見出し 1",
+    "h2": "見出し 2",
+    "h3": "見出し 3",
+    "bold": "太字 (⌘B)",
+    "italic": "斜体 (⌘I)",
+    "strike": "取り消し線",
+    "inlineCode": "インラインコード",
+    "ul": "箇条書き",
+    "ol": "番号付きリスト",
+    "task": "タスクリスト",
+    "quote": "引用",
+    "link": "リンク",
+    "image": "画像",
+    "codeBlock": "コードブロック",
+    "table": "表",
+    "hr": "区切り線",
+    "inlineMath": "インライン数式 ($)",
+    "blockMath": "ブロック数式 ($$)",
+    "chart": "グラフ",
+    "mermaid": "Mermaid 図",
+    "modeEditor": "エディタのみ",
+    "modeSplit": "2 分割",
+    "modePreview": "プレビューのみ",
+    "sidebar": "サイドバー",
+    "sidebarCollapse": "サイドバーを閉じる",
+    "sidebarExpand": "サイドバーを開く",
+    "pluginOff": "{{label}}（対応するプラグインが無効です）"
+  },
+  "tabs": {
+    "label": "開いているファイル",
+    "close": "{{name}} を閉じる",
+    "closeUnsaved": "{{name}} を閉じる（未保存）"
+  },
+  "sidebar": {
+    "label": "フォルダ",
+    "refresh": "更新",
+    "close": "フォルダを閉じる",
+    "empty": "このフォルダに .md ファイルはありません",
+    "truncated": "ファイルが多すぎるため、一部のみ表示しています",
+    "resize": "サイドバーの幅を調整",
+    "closeOverlay": "サイドバーを閉じる"
+  },
+  "status": {
+    "saved": "{{name}} を保存しました",
+    "exporting": "書き出し中…",
+    "exported": "{{kind}} を書き出しました",
+    "exportFailed": "書き出しに失敗しました：{{error}}",
+    "openFolderFailed": "フォルダを開けません：{{error}}",
+    "openFileFailed": "{{path}} を開けません：{{error}}",
+    "pluginErrors": "プラグインのエラー：{{list}}",
+    "listSeparator": "；",
+    "characters": "{{n}} 文字",
+    "version": "バージョン {{version}}",
+    "devBuild": "開発ビルド"
+  },
+  "closeDialog": {
+    "title": "「{{name}}」は保存されていません",
+    "description": "閉じる前に、このファイルの変更を保存しますか？",
+    "cancel": "キャンセル",
+    "discard": "保存しない",
+    "save": "保存"
+  },
+  "settings": {
+    "title": "設定",
+    "close": "閉じる",
+    "tabs": {
+      "general": "一般",
+      "appearance": "外観",
+      "plugins": "プラグイン",
+      "ai": "AI"
+    },
+    "general": {
+      "language": "言語",
+      "system": "システムの設定に従う",
+      "hint": "すぐに反映されます。「システムの設定に従う」はコンピュータの言語を使い、対応していない言語の場合は英語になります。",
+      "defaultApp": {
+        "title": "既定の Markdown アプリ",
+        "hint": ".md ファイルをダブルクリックしたときにこのアプリで開きます。これは OS が決めるため、設定手順が表示されます。",
+        "button": "既定の Markdown アプリに設定…"
+      }
+    },
+    "appearance": {
+      "builtin": "組み込みの外観",
+      "custom": "カスタム外観",
+      "noCustom": "カスタム外観はまだありません。.css ファイルを外観フォルダに入れて「再読み込み」を押してください。",
+      "openFolder": "外観フォルダを開く",
+      "reload": "再読み込み"
+    },
+    "plugins": {
+      "builtin": "組み込みプラグイン",
+      "custom": "カスタムプラグイン",
+      "noCustom": "カスタムプラグインはまだありません",
+      "openFolder": "プラグインフォルダを開く",
+      "reload": "再読み込み",
+      "error": "読み込みに失敗しました：{{error}}"
+    },
+    "ai": {
+      "intro": "AI アシスタント（Claude Code など）が MCP を通じてドキュメントを読み書きできるようにします。サーバーはこのコンピュータ上でのみ待ち受けます。",
+      "status": {
+        "off": "オフ",
+        "running": "実行中：127.0.0.1:{{port}}",
+        "failed": "起動できません：{{error}}"
+      },
+      "enable": "MCP サーバーを有効にする",
+      "allowWrite": "AI によるドキュメントの編集を許可",
+      "allowWriteHint": "オフの場合、AI は読み取りのみ可能です。",
+      "directWrite": "AI による直接書き込みを許可",
+      "directWriteHint": "1 行ずつのレビューを省略します。AI の変更は差分表示されずにそのまま適用されます。「AI によるドキュメントの編集を許可」がオンのときだけ有効です。",
+      "connect": "AI を接続",
+      "copyCommand": "Claude Code 接続コマンドをコピー",
+      "copyJson": "MCP 接続設定（JSON）をコピー",
+      "copied": "コピーしました（トークンを含むため、公開しないでください）",
+      "regenerate": "接続トークンを再生成…"
+    }
+  },
+  "snippet": {
+    "text": "テキスト",
+    "linkText": "リンクテキスト",
+    "imageAlt": "画像の説明",
+    "column": "列",
+    "cell": "内容",
+    "mermaidStart": "開始",
+    "mermaidEnd": "終了",
+    "chartTitle": "タイトル",
+    "chartItem": "項目",
+    "chartSeriesA": "系列 A",
+    "chartSeriesB": "系列 B",
+    "chartRow1": "一",
+    "chartRow2": "二",
+    "chartRow3": "三"
+  },
+  "plugins": {
+    "mermaid": "Mermaid 図",
+    "math": "LaTeX 数式",
+    "chart": "グラフ（Chart.js）",
+    "noDefaultExport": "プラグインファイルに default export がありません"
+  },
+  "chart": {
+    "alt": "グラフ",
+    "noTable": "chart ブロックには Markdown の表が必要です",
+    "tableTooSmall": "表には少なくとも 2 列（ラベル＋データ系列）と 1 行のデータが必要です",
+    "unsupportedType": "未対応のグラフの種類「{{type}}」です（使用可能：{{list}}）",
+    "specInvalid": "chart の設定には type と data が必要です（Chart.js の形式、YAML または JSON）",
+    "listSeparator": "、"
+  },
+  "review": {
+    "banner": "AI が {{n}} 行を変更しました",
+    "acceptAll": "すべて承認",
+    "rejectAll": "すべて却下",
+    "next": "次の変更",
+    "prev": "前の変更",
+    "acceptLine": "この変更を承認",
+    "rejectLine": "この変更を却下",
+    "tab": "レビュー待ちの変更 {{n}} 件"
+  }
+}

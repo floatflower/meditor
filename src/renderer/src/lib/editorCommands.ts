@@ -1,12 +1,14 @@
 import { EditorSelection } from '@codemirror/state'
 import type { EditorView } from '@codemirror/view'
+import { i18n } from '@/i18n'
 
 export type EditorCommand = (view: EditorView) => void
 
 /** Toggle an inline marker (`**`, `*`, `~~`, `` ` ``) around the selection, or insert a placeholder. */
 export const wrap =
-  (before: string, after: string = before, placeholder = '文字'): EditorCommand =>
+  (before: string, after: string = before, placeholder?: string): EditorCommand =>
   (view) => {
+    // Looked up when the button is pressed, not when this module loads (the language is not known yet).
     view.dispatch(
       view.state.changeByRange((range) => {
         const { doc } = view.state
@@ -24,7 +26,7 @@ export const wrap =
             range: EditorSelection.range(range.from - before.length, range.to - before.length)
           }
         }
-        const text = range.empty ? placeholder : doc.sliceString(range.from, range.to)
+        const text = range.empty ? (placeholder ?? i18n.t('snippet.text')) : doc.sliceString(range.from, range.to)
         const from = range.from + before.length
         return {
           changes: { from: range.from, to: range.to, insert: before + text + after },
@@ -110,7 +112,7 @@ export const insertBlock =
 export const link: EditorCommand = (view) => {
   const { state } = view
   const r = state.selection.main
-  const label = r.empty ? '連結文字' : state.sliceDoc(r.from, r.to)
+  const label = r.empty ? i18n.t('snippet.linkText') : state.sliceDoc(r.from, r.to)
   const insert = `[${label}](https://)`
   const urlFrom = r.from + label.length + 3
   view.dispatch({
@@ -121,7 +123,7 @@ export const link: EditorCommand = (view) => {
 
 export const image: EditorCommand = (view) => {
   const r = view.state.selection.main
-  const alt = r.empty ? '圖片說明' : view.state.sliceDoc(r.from, r.to)
+  const alt = r.empty ? i18n.t('snippet.imageAlt') : view.state.sliceDoc(r.from, r.to)
   const urlFrom = r.from + alt.length + 4
   view.dispatch({
     changes: { from: r.from, to: r.to, insert: `![${alt}](https://)` },
@@ -136,20 +138,35 @@ export const codeBlock: EditorCommand = (view) => {
   view.dispatch({ changes: { from: r.from, to: r.to, insert: '```\n' + text + '\n```' } })
 }
 
-export const table = insertBlock(
-  '| 欄位 1 | 欄位 2 | 欄位 3 |\n| --- | --- | --- |\n| 內容 | 內容 | 內容 |',
-  2,
-  6
-)
+export const table: EditorCommand = (view) => {
+  const column = i18n.t('snippet.column')
+  const cell = i18n.t('snippet.cell')
+  const first = `${column} 1`
+  insertBlock(
+    `| ${first} | ${column} 2 | ${column} 3 |\n| --- | --- | --- |\n| ${cell} | ${cell} | ${cell} |`,
+    2,
+    2 + first.length
+  )(view)
+}
 
 export const horizontalRule = insertBlock('---\n', 5)
 
-const MERMAID = '```mermaid\ngraph TD\n  A[開始] --> B[結束]\n```'
-export const mermaidBlock = insertBlock(MERMAID, 11, MERMAID.length - 4)
+export const mermaidBlock: EditorCommand = (view) => {
+  const open = '```mermaid\n'
+  const body = `graph TD\n  A[${i18n.t('snippet.mermaidStart')}] --> B[${i18n.t('snippet.mermaidEnd')}]`
+  insertBlock(`${open}${body}\n\`\`\``, open.length, open.length + body.length)(view)
+}
 
 export const inlineMath = wrap('$', '$', 'E = mc^2')
 
 export const mathBlock = insertBlock('$$\n\\int_0^1 x^2\\,dx = \\frac{1}{3}\n$$', 3, 3 + '\\int_0^1 x^2\\,dx = \\frac{1}{3}'.length)
 
-const CHART = ':::chart{type=bar title="標題"}\n| 項目 | 系列 A | 系列 B |\n| --- | --- | --- |\n| 一 | 10 | 14 |\n| 二 | 20 | 18 |\n| 三 | 15 | 25 |\n:::'
-export const chartBlock = insertBlock(CHART, CHART.indexOf('標題'), CHART.indexOf('標題') + 2)
+export const chartBlock: EditorCommand = (view) => {
+  const t = (key: string): string => i18n.t(`snippet.${key}`)
+  const title = t('chartTitle')
+  const snippet =
+    `:::chart{type=bar title="${title}"}\n| ${t('chartItem')} | ${t('chartSeriesA')} | ${t('chartSeriesB')} |\n| --- | --- | --- |\n` +
+    `| ${t('chartRow1')} | 10 | 14 |\n| ${t('chartRow2')} | 20 | 18 |\n| ${t('chartRow3')} | 15 | 25 |\n:::`
+  // The title is selected so it can be typed over straight away.
+  insertBlock(snippet, snippet.indexOf(title), snippet.indexOf(title) + title.length)(view)
+}

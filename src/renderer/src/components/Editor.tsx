@@ -1,9 +1,10 @@
 import { useEffect, useImperativeHandle, useRef } from 'react'
 import { EditorView, basicSetup } from 'codemirror'
-import { EditorState, type Extension } from '@codemirror/state'
+import { EditorState, type ChangeSpec, type Extension } from '@codemirror/state'
 import { keymap } from '@codemirror/view'
 import { indentWithTab } from '@codemirror/commands'
 import { wrap, type EditorCommand } from '@/lib/editorCommands'
+import { acceptAll, countChanges, dispatchReviewed, goToChange, rejectAll, reviewExtension, reviewField } from '@/lib/review'
 import { markdown } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 
@@ -14,6 +15,11 @@ export interface EditorHandle {
   withView: <T,>(fn: (view: EditorView) => T) => T | undefined
   /** Drop what is remembered about a document that has been closed. */
   forget: (docKey: string) => void
+  /** Apply an edit that does not come from the user. With `review` on, it is shown as a diff to accept or reject. */
+  applyEdit: (changes: ChangeSpec, review: boolean) => void
+  acceptAll: () => void
+  rejectAll: () => void
+  goToChange: (direction: 1 | -1) => void
 }
 
 interface Props {
@@ -22,6 +28,8 @@ interface Props {
   value: string
   docKey: string
   onChange: (value: string) => void
+  /** How many changes are waiting for review in this document. */
+  onReview?: (docKey: string, changes: number) => void
 }
 
 interface Remembered {
@@ -29,7 +37,7 @@ interface Remembered {
   scrollTop: number
 }
 
-export default function Editor({ ref, value, docKey, onChange }: Props): React.JSX.Element {
+export default function Editor({ ref, value, docKey, onChange, onReview }: Props): React.JSX.Element {
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
   const extensions = useRef<Extension[]>([])
@@ -38,6 +46,8 @@ export default function Editor({ ref, value, docKey, onChange }: Props): React.J
   const currentKey = useRef(docKey)
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
+  const onReviewRef = useRef(onReview)
+  onReviewRef.current = onReview
 
   useImperativeHandle(ref, () => ({
     exec: (command) => {
@@ -49,7 +59,13 @@ export default function Editor({ ref, value, docKey, onChange }: Props): React.J
     withView: (fn) => (view.current ? fn(view.current) : undefined),
     forget: (key) => {
       remembered.current.delete(key)
-    }
+    },
+    applyEdit: (changes, review) => {
+      if (view.current) dispatchReviewed(view.current, changes, review)
+    },
+    acceptAll: () => view.current && acceptAll(view.current),
+    rejectAll: () => view.current && rejectAll(view.current),
+    goToChange: (direction) => view.current && goToChange(view.current, direction)
   }))
 
   useEffect(() => {
@@ -60,6 +76,7 @@ export default function Editor({ ref, value, docKey, onChange }: Props): React.J
         indentWithTab
       ]),
       basicSetup,
+      reviewExtension,
       markdown({ codeLanguages: languages }),
       EditorView.lineWrapping,
       EditorView.theme({
@@ -68,6 +85,9 @@ export default function Editor({ ref, value, docKey, onChange }: Props): React.J
       }),
       EditorView.updateListener.of((u) => {
         if (u.docChanged) onChangeRef.current(u.state.doc.toString())
+        if (u.docChanged || u.startState.field(reviewField) !== u.state.field(reviewField)) {
+          onReviewRef.current?.(currentKey.current, countChanges(u.state))
+        }
       })
     ]
     const v = new EditorView({
@@ -87,6 +107,7 @@ export default function Editor({ ref, value, docKey, onChange }: Props): React.J
     const next = remembered.current.get(docKey)
     v.setState(next?.state ?? EditorState.create({ doc: value, extensions: extensions.current }))
     currentKey.current = docKey
+    onReviewRef.current?.(docKey, countChanges(v.state)) // setState does not notify listeners
     requestAnimationFrame(() => {
       v.scrollDOM.scrollTop = next?.scrollTop ?? 0
     })

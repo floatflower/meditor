@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 
 export interface TabInfo {
@@ -14,6 +15,8 @@ interface Props {
   activeId: number
   onSelect: (id: number) => void
   onClose: (id: number) => void
+  /** Changes waiting for review, per tab id. */
+  reviews?: Record<number, number>
 }
 
 /** The folder a file sits in, shown only to tell apart tabs that share a file name. */
@@ -22,7 +25,8 @@ const parentOf = (path: string | null): string => {
   return parts.length > 1 ? parts[parts.length - 2] : ''
 }
 
-export default function TabBar({ tabs, activeId, onSelect, onClose }: Props): React.JSX.Element {
+export default function TabBar({ tabs, activeId, onSelect, onClose, reviews = {} }: Props): React.JSX.Element {
+  const { t } = useTranslation()
   const list = useRef<HTMLDivElement>(null)
 
   // Keep the active tab in view when there are more tabs than room.
@@ -34,7 +38,7 @@ export default function TabBar({ tabs, activeId, onSelect, onClose }: Props): Re
   for (const t of tabs) nameCount.set(t.name, (nameCount.get(t.name) ?? 0) + 1)
 
   return (
-    <div ref={list} role="tablist" aria-label="開啟的檔案" className="flex shrink-0 overflow-x-auto border-b bg-muted/40">
+    <div ref={list} role="tablist" aria-label={t('tabs.label')} className="flex shrink-0 overflow-x-auto border-b bg-muted/40">
       {tabs.map((tab) => {
         const active = tab.id === activeId
         const hint = (nameCount.get(tab.name) ?? 0) > 1 ? parentOf(tab.path) : ''
@@ -66,9 +70,18 @@ export default function TabBar({ tabs, activeId, onSelect, onClose }: Props): Re
               {tab.name}
               {hint && <span className="ml-1.5 text-xs opacity-60">{hint}</span>}
             </span>
+            {(reviews[tab.id] ?? 0) > 0 && (
+              <span
+                data-slot="review-badge"
+                title={t('review.tab', { n: reviews[tab.id] })}
+                className="shrink-0 rounded bg-amber-500/20 px-1 text-[10px] leading-4 font-medium text-amber-700 dark:text-amber-300"
+              >
+                {reviews[tab.id]}
+              </span>
+            )}
             <button
               type="button"
-              aria-label={tab.dirty ? `關閉 ${tab.name}（尚未儲存）` : `關閉 ${tab.name}`}
+              aria-label={t(tab.dirty ? 'tabs.closeUnsaved' : 'tabs.close', { name: tab.name })}
               onClick={(e) => {
                 e.stopPropagation()
                 onClose(tab.id)

@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { MenuAction, MenuState } from '../main/menu'
+import type { MenuAction } from '../main/menu'
+import type { AiPatch, AiState } from '../shared/ai'
 import type { FolderScan } from '../main/folder'
+import type { Lang, LanguageSetting } from '../shared/i18n'
 
 const api = {
   openFile: () => ipcRenderer.invoke('file:open'),
@@ -10,7 +12,6 @@ const api = {
   listThemes: () => ipcRenderer.invoke('themes:list'),
   listPlugins: () => ipcRenderer.invoke('plugins:list'),
   userPaths: () => ipcRenderer.invoke('paths:user'),
-  setMenuState: (state: MenuState) => ipcRenderer.send('menu:state', state),
   onMenuAction: (cb: (action: MenuAction) => void) => {
     const handler = (_e: unknown, action: MenuAction): void => cb(action)
     ipcRenderer.on('menu:action', handler)
@@ -33,6 +34,16 @@ const api = {
   stopWatchingFolder: () => ipcRenderer.send('folder:unwatch'),
   readFile: (path: string): Promise<{ path: string; name: string; content: string }> =>
     ipcRenderer.invoke('file:read', path),
+  getAppInfo: (): Promise<{ version: string; packaged: boolean; name: string; platform: string }> => ipcRenderer.invoke('app:info'),
+  openDefaultAppsSettings: (): Promise<void> => ipcRenderer.invoke('app:open-default-apps-settings'),
+  getAi: (): Promise<AiState> => ipcRenderer.invoke('ai:get'),
+  setAi: (patch: AiPatch): Promise<AiState> => ipcRenderer.invoke('ai:set', patch),
+  copyAiCommand: (): Promise<void> => ipcRenderer.invoke('ai:copy-command'),
+  copyAiJson: (): Promise<void> => ipcRenderer.invoke('ai:copy-json'),
+  regenerateAiToken: (): Promise<void> => ipcRenderer.invoke('ai:regenerate-token'),
+  getLanguage: (): Promise<{ setting: LanguageSetting; resolved: Lang }> => ipcRenderer.invoke('language:get'),
+  setLanguage: (setting: LanguageSetting): Promise<{ setting: LanguageSetting; resolved: Lang }> =>
+    ipcRenderer.invoke('language:set', setting),
   openPath: (path: string) => ipcRenderer.invoke('shell:open-path', path)
 }
 

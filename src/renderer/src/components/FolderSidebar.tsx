@@ -1,4 +1,5 @@
 import { ChevronRight, FileText, Folder, FolderOpen, RefreshCw, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { FolderScan, TreeNode } from '../../../main/folder'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -59,23 +60,24 @@ function Row({ node, depth, currentPath, expanded, onToggle, onOpen }: RowProps)
 }
 
 export default function FolderSidebar({ width, className, scan, currentPath, expanded, onToggle, onOpen, onRefresh, onClose }: Props): React.JSX.Element {
+  const { t } = useTranslation()
   return (
-    <aside className={cn('flex h-full shrink-0 flex-col border-r', className)} style={{ width, maxWidth: '85%' }} aria-label="資料夾">
+    <aside className={cn('flex h-full shrink-0 flex-col border-r', className)} style={{ width, maxWidth: '85%' }} aria-label={t('sidebar.label')}>
       <div className="flex items-center gap-1 border-b py-1 pl-3 pr-1">
         <span className="min-w-0 flex-1 truncate text-sm font-medium" title={scan.root}>
           {scan.name}
         </span>
-        <Button variant="ghost" size="icon-sm" aria-label="重新整理" title="重新整理" onClick={onRefresh}>
+        <Button variant="ghost" size="icon-sm" aria-label={t('sidebar.refresh')} title={t('sidebar.refresh')} onClick={onRefresh}>
           <RefreshCw />
         </Button>
-        <Button variant="ghost" size="icon-sm" aria-label="關閉資料夾" title="關閉資料夾" onClick={onClose}>
+        <Button variant="ghost" size="icon-sm" aria-label={t('sidebar.close')} title={t('sidebar.close')} onClick={onClose}>
           <X />
         </Button>
       </div>
 
       <nav className="min-h-0 flex-1 overflow-auto p-1">
         {scan.tree.length === 0 ? (
-          <p className="px-3 py-4 text-sm text-muted-foreground">這個資料夾裡沒有 .md 檔案</p>
+          <p className="px-3 py-4 text-sm text-muted-foreground">{t('sidebar.empty')}</p>
         ) : (
           <ul>
             {scan.tree.map((node) => (
@@ -83,7 +85,7 @@ export default function FolderSidebar({ width, className, scan, currentPath, exp
             ))}
           </ul>
         )}
-        {scan.truncated && <p className="px-3 py-2 text-xs text-muted-foreground">檔案太多，只顯示部分</p>}
+        {scan.truncated && <p className="px-3 py-2 text-xs text-muted-foreground">{t('sidebar.truncated')}</p>}
       </nav>
     </aside>
   )
