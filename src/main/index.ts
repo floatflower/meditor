@@ -7,7 +7,8 @@ import { loadSettings, newToken, saveSettings, type Settings } from './settings'
 import { isLanguageSetting, resolveLanguage, type Lang } from '../shared/i18n'
 import type { AiPatch, AiState } from '../shared/ai'
 import { setMainLanguage, t } from './i18n'
-import { access, cp, mkdir, readFile, readdir, stat, writeFile } from 'fs/promises'
+import { access, cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'fs/promises'
+import { embedFonts, type FontKind } from './fonts'
 
 const userDir = (sub: string): string => join(app.getPath('userData'), sub)
 
@@ -206,6 +207,8 @@ function registerIpc(): void {
     return { path: target, name: basename(target) }
   })
 
+  ipcMain.handle('fonts:embed', (_e, text: string, kinds: FontKind[]) => embedFonts(text, kinds))
+
   ipcMain.handle('export:html', async (_e, html: string) => {
     const r = await dialog.showSaveDialog({
       defaultPath: 'document.html',
@@ -224,12 +227,16 @@ function registerIpc(): void {
     })
     if (r.canceled || !r.filePath) return false
     const win = new BrowserWindow({ show: false, webPreferences: { sandbox: true } })
+    // Through a file: a data: URL is capped at about 2MB, which embedded fonts and KaTeX can exceed.
+    const page = join(app.getPath('temp'), `meditor-export-${process.pid}-${Date.now()}.html`)
     try {
-      await win.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html))
+      await writeFile(page, html, 'utf-8')
+      await win.loadFile(page)
       const pdf = await win.webContents.printToPDF({ printBackground: true, pageSize: 'A4', preferCSSPageSize: true })
       await writeFile(r.filePath, pdf)
     } finally {
       win.destroy()
+      await rm(page, { force: true })
     }
     return true
   })

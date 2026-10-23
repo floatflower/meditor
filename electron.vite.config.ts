@@ -8,6 +8,14 @@ export default defineConfig({
   preload: { plugins: [externalizeDepsPlugin()] },
   renderer: {
     resolve: { alias: { '@': resolve('src/renderer/src') } },
-    plugins: [react(), tailwindcss()]
+    plugins: [react(), tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          // Fonts keep their names (no hash) so the main process can read the same files for export.
+          assetFileNames: (info) => ((info.names?.[0] ?? '').endsWith('.woff2') ? 'fonts/[name][extname]' : 'assets/[name]-[hash][extname]')
+        }
+      }
+    }
   }
 })

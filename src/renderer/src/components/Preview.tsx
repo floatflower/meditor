@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { renderMarkdown, runPostRender, type MdPlugin } from '@/lib/markdown'
 import { collectCss } from '@/lib/export'
 
@@ -11,11 +11,20 @@ interface Props {
 }
 
 export default function Preview({ source, themeCss, plugins, onRendered }: Props): React.JSX.Element {
+  const pane = useRef<HTMLDivElement>(null)
   const article = useRef<HTMLElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [rendered, setRendered] = useState('')
   const onRenderedRef = useRef(onRendered)
   onRenderedRef.current = onRendered
+
+  // The theme paints its background on the 820px column; hand it to the pane too so the sides match.
+  useLayoutEffect(() => {
+    if (!pane.current || !article.current) return
+    const { backgroundColor, backgroundImage } = getComputedStyle(article.current)
+    pane.current.style.backgroundColor = backgroundColor
+    pane.current.style.backgroundImage = backgroundImage
+  }, [themeCss, plugins, rendered])
 
   useEffect(() => {
     let stale = false
@@ -43,7 +52,7 @@ export default function Preview({ source, themeCss, plugins, onRendered }: Props
   }, [source, plugins, themeCss])
 
   return (
-    <div className="relative h-full overflow-auto">
+    <div ref={pane} className="relative h-full overflow-auto">
       <style>{collectCss(themeCss, plugins, rendered)}</style>
       {error && (
         <div className="sticky top-0 z-10 bg-destructive px-3 py-1 text-xs text-white">{error}</div>

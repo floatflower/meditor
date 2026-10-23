@@ -16,6 +16,11 @@ export async function buildExportHtml(
   body.innerHTML = await renderMarkdown(source, plugins)
   await runPostRender(body, plugins, { themeCss })
 
+  // The bundled fonts live in the app, so a theme that uses them gets them cut down to this document's
+  // characters and embedded; otherwise the file would fall back to whatever the reader has installed.
+  const kinds = (['sans', 'serif'] as const).filter((k) => themeCss.includes(`Noto ${k === 'sans' ? 'Sans' : 'Serif'}`))
+  const fonts = kinds.length ? await window.api.embedFonts(body.textContent ?? '', [...kinds]) : ''
+
   const esc = title.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`)
   return `<!doctype html>
 <html lang="zh-Hant">
@@ -23,7 +28,8 @@ export async function buildExportHtml(
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc}</title>
-<style>${collectCss(themeCss, plugins, body.innerHTML)}</style>
+<style>${fonts}
+${collectCss(themeCss, plugins, body.innerHTML)}</style>
 </head>
 <body class="markdown-body">
 ${body.innerHTML}

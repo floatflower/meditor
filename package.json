@@ -71,6 +71,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",
+    "subset-font": "^2.9.0",
     "zod": "^4.6.7"
   },
   "overrides": {
@@ -83,7 +84,9 @@
     "productName": "MEditor",
     "files": [
       "out/**/*",
-      "package.json"
+      "package.json",
+      "resources/fonts/coverage.json",
+      "resources/fonts/OFL-*.txt"
     ],
     "directories": {
       "output": "release"

@@ -7,6 +7,7 @@ import type { Lang, LanguageSetting } from '../shared/i18n'
 const api = {
   openFile: () => ipcRenderer.invoke('file:open'),
   saveFile: (path: string | null, content: string) => ipcRenderer.invoke('file:save', path, content),
+  embedFonts: (text: string, kinds: ('sans' | 'serif')[]) => ipcRenderer.invoke('fonts:embed', text, kinds) as Promise<string>,
   exportHtml: (html: string) => ipcRenderer.invoke('export:html', html),
   exportPdf: (html: string) => ipcRenderer.invoke('export:pdf', html),
   listThemes: () => ipcRenderer.invoke('themes:list'),
