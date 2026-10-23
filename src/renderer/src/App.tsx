@@ -168,16 +168,6 @@ export default function App(): React.JSX.Element {
   }, [reloadExtensions])
 
   useEffect(() => {
-    const dark = window.matchMedia('(prefers-color-scheme: dark)')
-    const apply = (): void => {
-      document.documentElement.classList.toggle('dark', dark.matches)
-    }
-    apply()
-    dark.addEventListener('change', apply)
-    return () => dark.removeEventListener('change', apply)
-  }, [])
-
-  useEffect(() => {
     document.title = `${doc.name}${dirty ? ' •' : ''}`
   }, [doc.name, dirty])
 

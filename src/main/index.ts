@@ -1,4 +1,4 @@
-import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, shell } from 'electron'
+import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, nativeTheme, shell } from 'electron'
 import { join, basename, resolve } from 'path'
 import { buildMenu, type MenuAction, type MenuActions } from './menu'
 import { McpController } from './mcp'
@@ -376,6 +376,9 @@ if (!app.requestSingleInstanceLock()) {
     event.preventDefault()
     queueOpen(path)
   })
+
+  // Dark mode is not ready yet: stay light whatever the OS says.
+  nativeTheme.themeSource = 'light'
 
   app.whenReady().then(async () => {
     await migrateLegacyData()
