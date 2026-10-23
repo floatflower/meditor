@@ -1,6 +1,6 @@
 # Third-party notices
 
-MEditor's own code is released under the MIT License (see `LICENSE`). It bundles the following
+Folio's own code is released under the MIT License (see `LICENSE`). It bundles the following
 material under its own terms, which is not covered by that license.
 
 ## Noto Sans and Noto Serif
