@@ -1,16 +1,19 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { renderMarkdown, runPostRender, type MdPlugin } from '@/lib/markdown'
 import { collectCss } from '@/lib/export'
+import { inlineLocalImages } from '@/lib/localImages'
 
 interface Props {
   source: string
   themeCss: string
   plugins: MdPlugin[]
+  /** The open file, so relative image paths can be resolved; null for a document that is not saved yet. */
+  docPath: string | null
   /** Called once a render has fully finished (including diagrams and charts), with any error. */
   onRendered?: (source: string, error: string | null) => void
 }
 
-export default function Preview({ source, themeCss, plugins, onRendered }: Props): React.JSX.Element {
+export default function Preview({ source, themeCss, plugins, docPath, onRendered }: Props): React.JSX.Element {
   const pane = useRef<HTMLDivElement>(null)
   const article = useRef<HTMLElement>(null)
   const [error, setError] = useState<string | null>(null)
@@ -30,7 +33,7 @@ export default function Preview({ source, themeCss, plugins, onRendered }: Props
     let stale = false
     const timer = setTimeout(async () => {
       try {
-        const html = await renderMarkdown(source, plugins)
+        const html = await inlineLocalImages(await renderMarkdown(source, plugins), docPath, 'blob')
         if (stale || !article.current) return
         article.current.innerHTML = html
         setRendered(html)
@@ -49,7 +52,7 @@ export default function Preview({ source, themeCss, plugins, onRendered }: Props
       stale = true
       clearTimeout(timer)
     }
-  }, [source, plugins, themeCss])
+  }, [source, plugins, themeCss, docPath])
 
   return (
     <div ref={pane} className="relative h-full overflow-auto">

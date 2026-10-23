@@ -189,7 +189,6 @@
   "snippet": {
     "text": "文字",
     "linkText": "链接文字",
-    "imageAlt": "图片说明",
     "column": "列",
     "cell": "内容",
     "mermaidStart": "开始",
@@ -226,5 +225,18 @@
     "acceptLine": "接受这项修改",
     "rejectLine": "拒绝这项修改",
     "tab": "{{n}} 处修改待审阅"
+  },
+  "image": {
+    "title": "插入图片",
+    "description": "拖拽图片进来，或粘贴图片链接。",
+    "dropTitle": "把图片拖到这里",
+    "dropRelease": "松开以插入",
+    "dropHint": "或点击选择文件，可一次选多张",
+    "urlLabel": "图片链接",
+    "insert": "插入",
+    "noImages": "这些文件不是图片。支持 PNG、JPG、GIF、WebP、SVG、AVIF、BMP。",
+    "skipped": "已跳过 {{count}} 个不是图片的文件",
+    "pickTitle": "选择图片",
+    "filterName": "图片"
   }
 }

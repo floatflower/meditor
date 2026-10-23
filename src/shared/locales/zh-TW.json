@@ -189,7 +189,6 @@
   "snippet": {
     "text": "文字",
     "linkText": "連結文字",
-    "imageAlt": "圖片說明",
     "column": "欄位",
     "cell": "內容",
     "mermaidStart": "開始",
@@ -226,5 +225,18 @@
     "acceptLine": "接受這項修改",
     "rejectLine": "拒絕這項修改",
     "tab": "{{n}} 處修改待審閱"
+  },
+  "image": {
+    "title": "插入圖片",
+    "description": "拖曳圖片進來，或貼上圖片連結。",
+    "dropTitle": "把圖片拖到這裡",
+    "dropRelease": "放開以插入",
+    "dropHint": "或點擊選擇檔案，可一次選多張",
+    "urlLabel": "圖片連結",
+    "insert": "插入",
+    "noImages": "這些檔案不是圖片。支援 PNG、JPG、GIF、WebP、SVG、AVIF、BMP。",
+    "skipped": "已略過 {{count}} 個不是圖片的檔案",
+    "pickTitle": "選擇圖片",
+    "filterName": "圖片"
   }
 }

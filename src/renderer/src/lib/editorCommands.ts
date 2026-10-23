@@ -121,15 +121,29 @@ export const link: EditorCommand = (view) => {
   })
 }
 
-export const image: EditorCommand = (view) => {
-  const r = view.state.selection.main
-  const alt = r.empty ? i18n.t('snippet.imageAlt') : view.state.sliceDoc(r.from, r.to)
-  const urlFrom = r.from + alt.length + 4
-  view.dispatch({
-    changes: { from: r.from, to: r.to, insert: `![${alt}](https://)` },
-    selection: { anchor: urlFrom, head: urlFrom + 'https://'.length }
-  })
+export interface ImageItem {
+  alt: string
+  url: string
 }
+
+const imageMarkdown = ({ alt, url }: ImageItem): string => `![${alt}](${/[\s()]/.test(url) ? `<${url}>` : url})`
+
+/** Insert images: one goes in at the cursor (selected text becomes its description), several each get a paragraph. */
+export const insertImages =
+  (items: ImageItem[]): EditorCommand =>
+  (view) => {
+    if (items.length === 1) {
+      const r = view.state.selection.main
+      const selected = r.empty ? '' : view.state.sliceDoc(r.from, r.to)
+      const insert = imageMarkdown({ ...items[0], alt: selected || items[0].alt })
+      view.dispatch({
+        changes: { from: r.from, to: r.to, insert },
+        selection: { anchor: r.from + insert.length }
+      })
+    } else {
+      insertBlock(items.map(imageMarkdown).join('\n\n'))(view)
+    }
+  }
 
 export const codeBlock: EditorCommand = (view) => {
   const r = view.state.selection.main

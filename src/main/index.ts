@@ -9,6 +9,7 @@ import type { AiPatch, AiState } from '../shared/ai'
 import { setMainLanguage, t } from './i18n'
 import { access, cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'fs/promises'
 import { embedFonts, type FontKind } from './fonts'
+import { registerImageIpc } from './images'
 
 const userDir = (sub: string): string => join(app.getPath('userData'), sub)
 
@@ -207,6 +208,8 @@ function registerIpc(): void {
     return { path: target, name: basename(target) }
   })
 
+  registerImageIpc()
+
   ipcMain.handle('fonts:embed', (_e, text: string, kinds: FontKind[]) => embedFonts(text, kinds))
 
   ipcMain.handle('export:html', async (_e, html: string) => {
@@ -319,6 +322,11 @@ function createWindow(): void {
       contextIsolation: true,
       sandbox: false
     }
+  })
+
+  // Dropping a file anywhere but a drop zone would otherwise open it in place of the app.
+  win.webContents.on('will-navigate', (e, url) => {
+    if (url.startsWith('file:') && url !== win.webContents.getURL()) e.preventDefault()
   })
 
   rendererReady = false

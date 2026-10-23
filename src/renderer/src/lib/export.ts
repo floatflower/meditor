@@ -1,3 +1,4 @@
+import { inlineLocalImages } from './localImages'
 import { pluginCss, renderMarkdown, runPostRender, type MdPlugin } from './markdown'
 import previewCss from '../styles/preview.css?raw'
 
@@ -10,10 +11,11 @@ export async function buildExportHtml(
   source: string,
   title: string,
   themeCss: string,
-  plugins: MdPlugin[]
+  plugins: MdPlugin[],
+  docPath: string | null
 ): Promise<string> {
   const body = document.createElement('div')
-  body.innerHTML = await renderMarkdown(source, plugins)
+  body.innerHTML = await inlineLocalImages(await renderMarkdown(source, plugins), docPath, 'data')
   await runPostRender(body, plugins, { themeCss })
 
   // The bundled fonts live in the app, so a theme that uses them gets them cut down to this document's

@@ -189,7 +189,6 @@
   "snippet": {
     "text": "text",
     "linkText": "link text",
-    "imageAlt": "image description",
     "column": "Column",
     "cell": "Content",
     "mermaidStart": "Start",
@@ -226,5 +225,18 @@
     "acceptLine": "Accept this change",
     "rejectLine": "Reject this change",
     "tab": "{{n}} changes awaiting review"
+  },
+  "image": {
+    "title": "Insert image",
+    "description": "Drop images in, or paste a link to one.",
+    "dropTitle": "Drop images here",
+    "dropRelease": "Release to insert",
+    "dropHint": "or click to choose files, several at once",
+    "urlLabel": "Image link",
+    "insert": "Insert",
+    "noImages": "Those files are not images. PNG, JPG, GIF, WebP, SVG, AVIF and BMP are supported.",
+    "skipped": "Skipped {{count}} file(s) that are not images",
+    "pickTitle": "Choose images",
+    "filterName": "Images"
   }
 }

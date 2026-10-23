@@ -34,7 +34,6 @@ import {
   codeBlock,
   heading,
   horizontalRule,
-  image,
   inlineMath,
   link,
   mathBlock,
@@ -52,7 +51,8 @@ interface Action {
   icon: LucideIcon
   /** Translation key of the tooltip. */
   label: string
-  command: EditorCommand
+  /** Run against the editor, or `'image'` to open the image dialog first. */
+  command: EditorCommand | 'image'
   /** Built-in plugin id that must be enabled for this action to make sense. */
   requires?: string
 }
@@ -77,7 +77,7 @@ const GROUPS: Action[][] = [
   ],
   [
     { icon: Link, label: 'header.link', command: link },
-    { icon: Image, label: 'header.image', command: image },
+    { icon: Image, label: 'header.image', command: 'image' },
     { icon: FileCode, label: 'header.codeBlock', command: codeBlock },
     { icon: Table, label: 'header.table', command: table },
     { icon: Minus, label: 'header.hr', command: horizontalRule },
@@ -98,13 +98,14 @@ interface Props {
   mode: ViewMode
   onModeChange: (mode: ViewMode) => void
   onCommand: (command: EditorCommand) => void
+  onImage: () => void
   /** Ids of the plugins that are currently enabled. */
   enabledPlugins: ReadonlySet<string>
   /** Present only while a folder is open: the sidebar toggle shown at the far left. */
   sidebar?: { open: boolean; onToggle: () => void }
 }
 
-export default function Header({ mode, onModeChange, onCommand, enabledPlugins, sidebar }: Props): React.JSX.Element {
+export default function Header({ mode, onModeChange, onCommand, onImage, enabledPlugins, sidebar }: Props): React.JSX.Element {
   const { t } = useTranslation()
   const editing = mode !== 'preview'
 
@@ -146,7 +147,7 @@ export default function Header({ mode, onModeChange, onCommand, enabledPlugins, 
                     disabled={!editing || !available}
                     // Keep the editor's selection/focus when the button is pressed.
                     onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => onCommand(command)}
+                    onClick={() => (command === 'image' ? onImage() : onCommand(command))}
                   >
                     <Icon />
                   </Button>

@@ -1,10 +1,16 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import type { MenuAction } from '../main/menu'
 import type { AiPatch, AiState } from '../shared/ai'
 import type { FolderScan } from '../main/folder'
 import type { Lang, LanguageSetting } from '../shared/i18n'
 
 const api = {
+  pickImages: () => ipcRenderer.invoke('images:pick') as Promise<string[]>,
+  imageMarkdown: (paths: string[], docPath: string | null) => ipcRenderer.invoke('images:markdown', paths, docPath) as Promise<string[]>,
+  readImage: (src: string, docPath: string | null, knownMtime?: number) =>
+    ipcRenderer.invoke('images:read', src, docPath, knownMtime) as Promise<{ mtime: number; mime?: string; bytes?: Uint8Array } | null>,
+  /** The path of a file the user dropped (File objects no longer carry it themselves). */
+  pathForFile: (file: File) => webUtils.getPathForFile(file),
   openFile: () => ipcRenderer.invoke('file:open'),
   saveFile: (path: string | null, content: string) => ipcRenderer.invoke('file:save', path, content),
   embedFonts: (text: string, kinds: ('sans' | 'serif')[]) => ipcRenderer.invoke('fonts:embed', text, kinds) as Promise<string>,

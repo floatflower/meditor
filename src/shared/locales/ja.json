@@ -189,7 +189,6 @@
   "snippet": {
     "text": "テキスト",
     "linkText": "リンクテキスト",
-    "imageAlt": "画像の説明",
     "column": "列",
     "cell": "内容",
     "mermaidStart": "開始",
@@ -226,5 +225,18 @@
     "acceptLine": "この変更を承認",
     "rejectLine": "この変更を却下",
     "tab": "レビュー待ちの変更 {{n}} 件"
+  },
+  "image": {
+    "title": "画像を挿入",
+    "description": "画像をドロップするか、画像のリンクを貼り付けます。",
+    "dropTitle": "ここに画像をドロップ",
+    "dropRelease": "放して挿入",
+    "dropHint": "またはクリックしてファイルを選択（複数可）",
+    "urlLabel": "画像のリンク",
+    "insert": "挿入",
+    "noImages": "画像ではないファイルです。PNG、JPG、GIF、WebP、SVG、AVIF、BMP に対応しています。",
+    "skipped": "画像ではないファイルを {{count}} 件スキップしました",
+    "pickTitle": "画像を選択",
+    "filterName": "画像"
   }
 }

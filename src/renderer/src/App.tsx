@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import Editor, { type EditorHandle } from '@/components/Editor'
 import Header, { type ViewMode } from '@/components/Header'
+import ImageDialog from '@/components/ImageDialog'
+import { insertImages, type ImageItem } from '@/lib/editorCommands'
 import FolderSidebar from '@/components/FolderSidebar'
 import SettingsDialog from '@/components/SettingsDialog'
 import ReviewBanner from '@/components/ReviewBanner'
@@ -128,6 +130,7 @@ export default function App(): React.JSX.Element {
     [pluginEntries]
   )
   const [status, setStatus] = useState('')
+  const [imageOpen, setImageOpen] = useState(false)
   const [mode, setMode] = useState<ViewMode>('split')
   const textRef = useRef(text)
   textRef.current = text
@@ -385,7 +388,7 @@ export default function App(): React.JSX.Element {
     async (kind: 'html' | 'pdf') => {
       setStatus(t('status.exporting'))
       try {
-        const html = await buildExportHtml(textRef.current, doc.name, theme.css, plugins)
+        const html = await buildExportHtml(textRef.current, doc.name, theme.css, plugins, doc.path)
         const ok = kind === 'html' ? await window.api.exportHtml(html) : await window.api.exportPdf(html)
         setStatus(ok ? t('status.exported', { kind: kind.toUpperCase() }) : '')
       } catch (err) {
@@ -550,6 +553,7 @@ export default function App(): React.JSX.Element {
           mode={mode}
           onModeChange={setMode}
           onCommand={(c) => editor.current?.exec(c)}
+          onImage={() => setImageOpen(true)}
           enabledPlugins={enabledPlugins}
           sidebar={workspace ? { open: sidebarOpen, onToggle: () => setSidebarOpen((o) => !o) } : undefined}
         />
@@ -634,6 +638,7 @@ export default function App(): React.JSX.Element {
                 source={text}
                 themeCss={theme.css}
                 plugins={plugins}
+                docPath={doc.path}
                 onRendered={(source, error) => {
                   rendered.current = { source, error }
                 }}
@@ -659,6 +664,15 @@ export default function App(): React.JSX.Element {
         </footer>
       </div>
 
+      <ImageDialog
+        open={imageOpen}
+        onOpenChange={setImageOpen}
+        docPath={doc.path}
+        onInsert={(items: ImageItem[], skipped: number) => {
+          editor.current?.exec(insertImages(items))
+          setStatus(skipped ? t('image.skipped', { count: skipped }) : '')
+        }}
+      />
       <SettingsDialog
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
