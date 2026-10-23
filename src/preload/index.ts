@@ -3,8 +3,21 @@ import type { MenuAction } from '../main/menu'
 import type { AiPatch, AiState } from '../shared/ai'
 import type { FolderScan } from '../main/folder'
 import type { Lang, LanguageSetting } from '../shared/i18n'
+import type { UpdateState } from '../shared/update'
 
 const api = {
+  getUpdate: () => ipcRenderer.invoke('update:get') as Promise<UpdateState>,
+  checkUpdate: () => ipcRenderer.invoke('update:check') as Promise<void>,
+  setAutoUpdate: (value: boolean) => ipcRenderer.invoke('update:set-auto', value) as Promise<void>,
+  dismissUpdate: () => ipcRenderer.invoke('update:dismiss') as Promise<void>,
+  openUpdatePage: () => ipcRenderer.invoke('update:open') as Promise<void>,
+  onUpdateState: (callback: (state: UpdateState) => void) => {
+    const listener = (_e: unknown, state: UpdateState): void => callback(state)
+    ipcRenderer.on('update:state', listener)
+    return (): void => {
+      ipcRenderer.removeListener('update:state', listener)
+    }
+  },
   pickImages: () => ipcRenderer.invoke('images:pick') as Promise<string[]>,
   imageMarkdown: (paths: string[], docPath: string | null) => ipcRenderer.invoke('images:markdown', paths, docPath) as Promise<string[]>,
   readImage: (src: string, docPath: string | null, knownMtime?: number) =>

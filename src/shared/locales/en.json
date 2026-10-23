@@ -152,6 +152,20 @@
         "title": "Default Markdown app",
         "hint": "Open .md files in this app when you double-click them. The operating system decides this, so you will be shown how to set it.",
         "button": "Set as default Markdown app…"
+      },
+      "updates": {
+        "title": "Software update",
+        "current": "Current version {{version}}",
+        "check": "Check for updates",
+        "idle": "Updates have not been checked yet.",
+        "checking": "Checking for updates…",
+        "upToDate": "You are up to date.",
+        "available": "Version {{version}} is available to download.",
+        "error": "Could not check for updates: {{error}}",
+        "unsupported": "A development build does not check for updates.",
+        "openPage": "Go to the download page",
+        "auto": "Check for updates automatically",
+        "autoHint": "Checks after start-up and every few hours, and tells you in the bottom-right corner when there is a new version. It only talks to GitHub and never sends your documents."
       }
     },
     "appearance": {
@@ -240,5 +254,10 @@
     "skipped": "Skipped {{count}} file(s) that are not images",
     "pickTitle": "Choose images",
     "filterName": "Images"
+  },
+  "updateNotice": {
+    "title": "Version {{version}} is available",
+    "body": "Click to open the download page",
+    "close": "Close, and do not remind me about this version"
   }
 }

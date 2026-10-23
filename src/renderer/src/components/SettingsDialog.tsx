@@ -7,6 +7,7 @@ import type { Theme } from '@/lib/themes'
 import type { LanguageSetting } from '../../../shared/i18n'
 import AiTab from './settings/AiTab'
 import AppearanceTab from './settings/AppearanceTab'
+import type { UpdateState } from '../../../shared/update'
 import GeneralTab from './settings/GeneralTab'
 import PluginsTab from './settings/PluginsTab'
 
@@ -26,6 +27,10 @@ interface Props {
   /** Open the themes or plugins folder in the file manager. */
   onOpenFolder: (kind: 'themes' | 'plugins') => void
   onReload: () => void
+  update: UpdateState | null
+  onCheckUpdate: () => void
+  onOpenUpdatePage: () => void
+  onAutoUpdate: (value: boolean) => void
 }
 
 export default function SettingsDialog({
@@ -39,7 +44,11 @@ export default function SettingsDialog({
   plugins,
   onTogglePlugin,
   onOpenFolder,
-  onReload
+  onReload,
+  update,
+  onCheckUpdate,
+  onOpenUpdatePage,
+  onAutoUpdate
 }: Props): React.JSX.Element {
   const { t } = useTranslation()
   const [tab, setTab] = useState<TabName>('general')
@@ -62,7 +71,14 @@ export default function SettingsDialog({
           </TabsList>
 
           <TabsContent value="general" className="mt-3 min-h-64">
-            <GeneralTab language={language} onLanguageChange={onLanguageChange} />
+            <GeneralTab
+              language={language}
+              onLanguageChange={onLanguageChange}
+              update={update}
+              onCheckUpdate={onCheckUpdate}
+              onOpenUpdatePage={onOpenUpdatePage}
+              onAutoUpdate={onAutoUpdate}
+            />
           </TabsContent>
           <TabsContent value="appearance" className="mt-3 min-h-64">
             <AppearanceTab

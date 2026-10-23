@@ -7,6 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import Editor, { type EditorHandle } from '@/components/Editor'
 import Header, { type ViewMode } from '@/components/Header'
 import ImageDialog from '@/components/ImageDialog'
+import UpdateNotice from '@/components/UpdateNotice'
 import { insertImages, type ImageItem } from '@/lib/editorCommands'
 import FolderSidebar from '@/components/FolderSidebar'
 import SettingsDialog from '@/components/SettingsDialog'
@@ -31,6 +32,7 @@ import { buildSyntaxGuide } from '@/lib/syntaxGuide'
 import { setLanguage } from '@/i18n'
 import { dispatchReviewed } from '@/lib/review'
 import type { LanguageSetting } from '../../shared/i18n'
+import type { UpdateState } from '../../shared/update'
 import type { MdPlugin } from '@/lib/markdown'
 import type { MenuAction } from '../../main/menu'
 
@@ -100,6 +102,7 @@ export default function App(): React.JSX.Element {
   const { t } = useTranslation()
   const [languageSetting, setLanguageSetting] = useState<LanguageSetting>('system')
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [update, setUpdate] = useState<UpdateState | null>(null)
   /** Changes waiting for review, per tab id. */
   const [reviewCounts, setReviewCounts] = useState<Record<number, number>>({})
   const [appInfo, setAppInfo] = useState<{ version: string; packaged: boolean; name: string; platform: string } | null>(null)
@@ -132,6 +135,10 @@ export default function App(): React.JSX.Element {
   const [status, setStatus] = useState('')
   const [imageOpen, setImageOpen] = useState(false)
   const [mode, setMode] = useState<ViewMode>('split')
+  useEffect(() => {
+    void window.api.getUpdate().then(setUpdate)
+    return window.api.onUpdateState(setUpdate)
+  }, [])
   const textRef = useRef(text)
   textRef.current = text
   const editor = useRef<EditorHandle>(null)
@@ -691,7 +698,15 @@ export default function App(): React.JSX.Element {
         onTogglePlugin={togglePlugin}
         onOpenFolder={(kind) => void openExtensionFolder(kind)}
         onReload={() => void reloadExtensions()}
+        update={update}
+        onCheckUpdate={() => void window.api.checkUpdate()}
+        onOpenUpdatePage={() => void window.api.openUpdatePage()}
+        onAutoUpdate={(value) => void window.api.setAutoUpdate(value)}
       />
+
+      {update?.notice && update.version && (
+        <UpdateNotice version={update.version} onOpen={() => void window.api.openUpdatePage()} onClose={() => void window.api.dismissUpdate()} />
+      )}
 
       <AlertDialog open={!!savePrompt} onOpenChange={(open) => !open && answerSave('cancel')}>
         <AlertDialogContent

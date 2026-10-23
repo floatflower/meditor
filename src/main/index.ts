@@ -11,6 +11,7 @@ import { access, cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'fs/pr
 import { embedFonts, type FontKind } from './fonts'
 import { writeHtmlWithAssets } from './exportHtml'
 import { registerImageIpc } from './images'
+import { UpdateController } from './updater'
 
 const userDir = (sub: string): string => join(app.getPath('userData'), sub)
 
@@ -36,6 +37,7 @@ async function listFiles(dir: string, ext: string): Promise<string[]> {
 
 let settings: Settings
 let mcp: McpController
+let updater: UpdateController
 
 // The app used to be called "mdeditor", and Electron keys its data folder on the app name. Carry the
 // settings and extensions over to the new folder once. Safe to delete when no old build is around.
@@ -211,6 +213,12 @@ function registerIpc(): void {
 
   registerImageIpc()
 
+  ipcMain.handle('update:get', () => updater.current)
+  ipcMain.handle('update:check', () => updater.check())
+  ipcMain.handle('update:set-auto', (_e, value: boolean) => updater.setAuto(value))
+  ipcMain.handle('update:dismiss', () => updater.dismiss())
+  ipcMain.handle('update:open', () => updater.open())
+
   ipcMain.handle('fonts:embed', (_e, text: string, kinds: FontKind[]) => embedFonts(text, kinds))
 
   ipcMain.handle('export:html', async (_e, html: string) => {
@@ -376,9 +384,18 @@ if (!app.requestSingleInstanceLock()) {
     setMainLanguage(currentLanguage())
     await saveSettings(settings) // persists a freshly generated token so copied client configs stay valid
     mcp = new McpController(() => settings.mcp, callRenderer)
+    updater = new UpdateController(
+      () => settings.updates,
+      async (patch) => {
+        Object.assign(settings.updates, patch)
+        await saveSettings(settings)
+      },
+      (state) => BrowserWindow.getAllWindows().forEach((w) => w.webContents.send('update:state', state))
+    )
     registerIpc()
     if (settings.mcp.enabled) await mcp.start()
     rebuildMenu()
+    updater.start()
     if (!app.isPackaged) app.dock?.setIcon(devIcon) // macOS shows Electron's own icon in dev otherwise
 
     const [launchPath] = pathsFromArgv(process.argv, process.cwd())
@@ -391,6 +408,7 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 app.on('before-quit', () => {
+  updater?.stop()
   stopWatching()
   void mcp?.stop()
 })

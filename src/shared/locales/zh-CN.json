@@ -152,6 +152,20 @@
         "title": "默认的 Markdown 程序",
         "hint": "双击 .md 文件时用这个程序打开。这由操作系统决定，所以会显示设置步骤。",
         "button": "设为默认的 Markdown 程序…"
+      },
+      "updates": {
+        "title": "软件更新",
+        "current": "当前版本 {{version}}",
+        "check": "检查更新",
+        "idle": "尚未检查更新。",
+        "checking": "正在检查更新…",
+        "upToDate": "当前已是最新版本。",
+        "available": "有新版本 {{version}} 可以下载。",
+        "error": "检查更新失败：{{error}}",
+        "unsupported": "开发版不会检查更新。",
+        "openPage": "前往下载页面",
+        "auto": "自动检查更新",
+        "autoHint": "启动后以及每隔几小时检查一次，有新版本时在右下角通知你。只会连接 GitHub，不会发送你的文档。"
       }
     },
     "appearance": {
@@ -240,5 +254,10 @@
     "skipped": "已跳过 {{count}} 个不是图片的文件",
     "pickTitle": "选择图片",
     "filterName": "图片"
+  },
+  "updateNotice": {
+    "title": "有新版本 {{version}}",
+    "body": "点一下前往下载页面",
+    "close": "关闭，这个版本不再提醒"
   }
 }

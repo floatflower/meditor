@@ -152,6 +152,20 @@
         "title": "預設的 Markdown 程式",
         "hint": "雙擊 .md 檔案時用這個程式開啟。這由作業系統決定，所以會顯示設定的步驟。",
         "button": "設為預設的 Markdown 程式…"
+      },
+      "updates": {
+        "title": "軟體更新",
+        "current": "目前版本 {{version}}",
+        "check": "檢查更新",
+        "idle": "尚未檢查更新。",
+        "checking": "正在檢查更新…",
+        "upToDate": "目前是最新版本。",
+        "available": "有新版本 {{version}} 可以下載。",
+        "error": "檢查更新失敗：{{error}}",
+        "unsupported": "開發版不會檢查更新。",
+        "openPage": "前往下載頁面",
+        "auto": "自動檢查更新",
+        "autoHint": "啟動後與每隔幾小時檢查一次，有新版本時在右下角通知你。只會連到 GitHub，不會傳送你的文件。"
       }
     },
     "appearance": {
@@ -240,5 +254,10 @@
     "skipped": "已略過 {{count}} 個不是圖片的檔案",
     "pickTitle": "選擇圖片",
     "filterName": "圖片"
+  },
+  "updateNotice": {
+    "title": "有新版本 {{version}}",
+    "body": "點一下前往下載頁面",
+    "close": "關閉，這個版本不再提醒"
   }
 }

@@ -16,8 +16,16 @@ export interface McpSettings {
   port: number
 }
 
+export interface UpdateSettings {
+  /** Look for a newer version shortly after start-up and every few hours. */
+  autoCheck: boolean
+  /** The newest version the user has closed the notice for; it only comes back for something newer. */
+  dismissedVersion: string | null
+}
+
 export interface Settings {
   mcp: McpSettings
+  updates: UpdateSettings
   /** `system` follows the computer's language; anything it does not support falls back to English. */
   language: LanguageSetting
 }
@@ -35,7 +43,8 @@ export async function loadSettings(): Promise<Settings> {
   }
   const mcp = { enabled: false, allowWrite: false, directWrite: false, token: '', port: 39217, ...saved.mcp }
   if (!mcp.token) mcp.token = newToken()
-  return { mcp, language: isLanguageSetting(saved.language) ? saved.language : 'system' }
+  const updates = { autoCheck: true, dismissedVersion: null, ...saved.updates }
+  return { mcp, updates, language: isLanguageSetting(saved.language) ? saved.language : 'system' }
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {

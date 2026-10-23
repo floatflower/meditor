@@ -3,14 +3,20 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
 import { LANGUAGES, LANGUAGE_NAMES, type LanguageSetting } from '../../../../shared/i18n'
+import type { UpdateState } from '../../../../shared/update'
 import DefaultAppGuide from './DefaultAppGuide'
+import UpdateSection from './UpdateSection'
 
 interface Props {
   language: LanguageSetting
   onLanguageChange: (setting: LanguageSetting) => void
+  update: UpdateState | null
+  onCheckUpdate: () => void
+  onOpenUpdatePage: () => void
+  onAutoUpdate: (value: boolean) => void
 }
 
-export default function GeneralTab({ language, onLanguageChange }: Props): React.JSX.Element {
+export default function GeneralTab({ language, onLanguageChange, update, onCheckUpdate, onOpenUpdatePage, onAutoUpdate }: Props): React.JSX.Element {
   const { t } = useTranslation()
   const [guideOpen, setGuideOpen] = useState(false)
 
@@ -41,6 +47,8 @@ export default function GeneralTab({ language, onLanguageChange }: Props): React
           </Button>
         </div>
       </section>
+
+      <UpdateSection update={update} onCheck={onCheckUpdate} onOpenPage={onOpenUpdatePage} onAutoCheck={onAutoUpdate} />
 
       <DefaultAppGuide open={guideOpen} onOpenChange={setGuideOpen} />
     </div>
