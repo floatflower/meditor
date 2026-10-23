@@ -1,0 +1,264 @@
+{
+ "ui": {
+  "title": "語法說明",
+  "subtitle": "MEditor 使用標準 Markdown，再加上幾個自訂語法。下面每個範例都附上程式碼，以及 app 實際渲染出來的樣子。",
+  "toc": "本頁內容",
+  "result": "渲染結果",
+  "copy": "複製",
+  "copied": "已複製",
+  "back": "回到首頁",
+  "pageBreakLabel": "::pagebreak",
+  "pageOne": "第一頁",
+  "pageTwo": "第二頁",
+  "onScreen": "螢幕上看不到",
+  "onPaper": "列印時從這裡換頁"
+ },
+ "sections": [
+  {
+   "id": "basics",
+   "title": "開始之前",
+   "blocks": [
+    {
+     "t": "ul",
+     "items": [
+      "標準語法：CommonMark 加上 GFM（表格、刪除線、待辦清單）。程式碼區塊標上語言就會自動語法上色。",
+      "自訂語法有固定的長相：區塊寫成 `:::名稱` 開頭、`:::` 結尾，單行的寫成 `::名稱`。",
+      "工具列的按鈕可以一鍵插入大部分語法。",
+      "Mermaid、LaTeX、圖表和待辦清單是內建插件，可以在「設定 → 插件」關掉；提示框和強制換頁是核心功能，一定可用。",
+      "寫錯不會弄壞文件，預覽會在原地顯示錯誤訊息。"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "chart",
+   "title": "資料圖表",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "有兩種寫法。寫法 A 把一張 Markdown 表格當資料，日常用最方便；寫法 B 直接寫 Chart.js 的設定，需要細部控制時用。"
+    },
+    {
+     "t": "h",
+     "text": "寫法 A：用表格"
+    },
+    {
+     "t": "p",
+     "text": "用 `:::chart{…}` 包住一張表格，結尾用 `:::`。第一欄是標籤，其餘每一欄是一組資料。"
+    },
+    {
+     "t": "example",
+     "example": "chart-table",
+     "alt": "用表格寫成的長條圖，有 2025 與 2026 兩組資料",
+     "result": true
+    },
+    {
+     "t": "p",
+     "text": "可用的屬性："
+    },
+    {
+     "t": "table",
+     "head": [
+      "屬性",
+      "說明"
+     ],
+     "rows": [
+      [
+       "`type`",
+       "圖表種類：`bar`、`line`、`area`、`pie`、`doughnut`、`radar`、`scatter`，預設 `bar`"
+      ],
+      [
+       "`title`",
+       "圖表標題"
+      ],
+      [
+       "`stacked`",
+       "堆疊，只適用 `bar` 和 `line`。直接寫成 `{type=bar stacked}`"
+      ],
+      [
+       "`height`",
+       "高度，單位是像素"
+      ],
+      [
+       "`legend`",
+       "寫 `legend=false` 可隱藏圖例。有多組資料或是圓餅圖時，預設會顯示圖例"
+      ]
+     ]
+    },
+    {
+     "t": "p",
+     "text": "`scatter` 的第一欄要是 x 軸的數值。"
+    },
+    {
+     "t": "h",
+     "text": "寫法 B：Chart.js 設定"
+    },
+    {
+     "t": "p",
+     "text": "語言標記為 `chart` 的程式碼區塊，內容是 Chart.js 的設定，可以寫 YAML 或 JSON。至少要有 `type` 和 `data`，也可以加 `width`、`height`（像素）。"
+    },
+    {
+     "t": "example",
+     "example": "chart-config",
+     "alt": "用 Chart.js 設定畫成的折線圖，有 Sales 與 Costs 兩條線",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "YAML 裡不能寫函式（例如 tooltip 的 callback）。",
+      "沒有指定顏色的資料組，會自動套用主題的配色。主題可以用 `--chart-1` 到 `--chart-8` 這些 CSS 變數調整。",
+      "設定有誤時，圖表的位置會顯示紅色的錯誤訊息。"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "todo",
+   "title": "待辦清單",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "用 `[ ]` 代表未完成、`[x]` 代表已完成，大小寫都可以。有三種放法：單獨成行、放在清單裡（可以巢狀）、放在表格的儲存格裡。"
+    },
+    {
+     "t": "example",
+     "example": "todo",
+     "alt": "三種待辦清單的寫法：單獨成行、巢狀清單、表格儲存格",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "單獨成行和表格裡的寫法，方括號後面要空一格；儲存格裡只有 `[x]` 時不用。",
+      "放在清單裡就是標準的 `- [x]` 寫法（Markdown 本身的功能），所以就算關掉待辦清單插件，它也一樣能用。",
+      "只有出現在一行最前面才會轉換。句子中間的 `[x]`，以及行內程式碼裡的，都維持原樣。",
+      "預覽和匯出裡的勾選框是唯讀的，要改狀態請修改原文。"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mermaid",
+   "title": "Mermaid 流程圖",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "用語言標記為 `mermaid` 的程式碼區塊寫圖表。流程圖、時序圖、甘特圖等 Mermaid 支援的圖種都可以。"
+    },
+    {
+     "t": "example",
+     "example": "mermaid",
+     "alt": "由 Mermaid 程式碼畫出的流程圖",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "外觀可以用主題的 CSS 變數調整，變數名稱以 `--mermaid-` 開頭，例如 `--mermaid-line`、`--mermaid-font`。",
+      "語法錯誤時，預覽會顯示紅色的錯誤訊息。"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "math",
+   "title": "LaTeX 數學公式",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "行內公式用單個 `$` 包住，獨立一行的公式用上下兩行 `$$` 夾住。使用 KaTeX 語法。"
+    },
+    {
+     "t": "example",
+     "example": "math",
+     "alt": "行內公式與獨立一行的積分公式",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "要顯示真正的美元符號請寫 `\\$`（例如 `\\$5`），否則兩個 `$` 之間的內容會被當成公式。",
+      "程式碼區塊和行內程式碼裡的 `$` 不受影響。",
+      "公式寫錯時，會以紅字顯示。"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "callout",
+   "title": "提示框",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "用 `:::note` 或 `:::warning` 包住內容，結尾用 `:::`。裡面可以放任何 Markdown。"
+    },
+    {
+     "t": "example",
+     "example": "callout",
+     "alt": "一個 note 提示框與一個帶自訂標題的 warning 提示框",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "用 `{title=\"…\"}` 可以改標題，預設標題是 note 或 warning。",
+      "**外層區塊的冒號數量要比裡面任何區塊多**，否則內層的結尾 `:::` 會把外層一起關掉。例如在提示框裡放圖表，外層就寫 `::::note`，結尾也用 `::::`。",
+      "名稱不認得的區塊會當成普通區塊顯示，不會報錯。"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pagebreak",
+   "title": "強制換頁",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "單獨一行寫 `::pagebreak`，列印或匯出 PDF 時，它後面的內容會從新的一頁開始。"
+    },
+    {
+     "t": "example",
+     "example": "pagebreak",
+     "alt": null,
+     "result": false
+    },
+    {
+     "t": "pagebreak"
+    },
+    {
+     "t": "ul",
+     "items": [
+      "它必須單獨佔一行。",
+      "在網頁預覽和螢幕上看不到它，只有列印時才會換頁。",
+      "匯出的 HTML 用瀏覽器列印時也一樣會換頁。"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "caption",
+   "title": "圖片說明",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "單獨成一行的圖片，如果有說明文字，說明會顯示在圖片下方當作圖說。"
+    },
+    {
+     "t": "example",
+     "example": "caption",
+     "alt": null,
+     "result": false
+    },
+    {
+     "t": "ul",
+     "items": [
+      "夾在句子中間的圖片，或沒有說明文字的圖片，不會有圖說。",
+      "不想顯示圖說的話，在主題的 CSS 加上 `figcaption { display: none }` 就好。",
+      "用工具列的圖片按鈕可以一次拖進多張圖片；說明文字預設是空的，需要圖說再自己填。"
+     ]
+    }
+   ]
+  }
+ ]
+}

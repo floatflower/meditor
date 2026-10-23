@@ -17,11 +17,13 @@ npm run build     # type-check, then build into docs/
 ## Publishing
 
 Repository Settings → Pages → Build and deployment → Source: **Deploy from a branch**, branch **`website`**, folder
-**`/docs`**. The site is then at `https://<user>.github.io/meditor/`. Every link is relative, so a custom domain works
-without changes.
+**`/docs`**. The site is at **https://meditor.floatflower.me** (`public/CNAME` holds the domain and every build copies it into
+`docs/`). Every link is relative, so it also works at `https://<user>.github.io/meditor/`.
 
 ## Editing
 
 - Copy and translations (繁體中文 and English): `src/lib/i18n.ts`, including the slogan.
+- The syntax guide: its text is `src/lib/syntax.*.json`, and the code samples are the `.md` files in `src/examples/`.
+  The pictures in `public/examples/` were rendered from those same files by the app, so re-take them if a sample changes.
 - Screenshots: `public/screens/`.
 - Release lookup and which file is which platform: `src/lib/releases.ts`.

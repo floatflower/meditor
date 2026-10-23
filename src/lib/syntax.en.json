@@ -1,0 +1,264 @@
+{
+ "ui": {
+  "title": "Syntax guide",
+  "subtitle": "MEditor uses standard Markdown plus a few custom pieces of syntax. Every example below comes with its code and with what the app actually renders from it.",
+  "toc": "On this page",
+  "result": "Rendered result",
+  "copy": "Copy",
+  "copied": "Copied",
+  "back": "Back to home",
+  "pageBreakLabel": "::pagebreak",
+  "pageOne": "Page 1",
+  "pageTwo": "Page 2",
+  "onScreen": "Not visible on screen",
+  "onPaper": "Printing starts a new page here"
+ },
+ "sections": [
+  {
+   "id": "basics",
+   "title": "Before you start",
+   "blocks": [
+    {
+     "t": "ul",
+     "items": [
+      "Standard syntax: CommonMark plus GFM (tables, strikethrough, task lists). Code blocks are highlighted when you name the language.",
+      "Custom syntax always looks the same: a block opens with `:::name` and closes with `:::`, and a one-line form is written `::name`.",
+      "Most of it can be inserted with a button on the toolbar.",
+      "Mermaid, LaTeX, charts and to-do lists are built-in plugins you can switch off in Settings → Plugins. Callouts and page breaks are core and always on.",
+      "A mistake never breaks the document: the preview shows the error in place."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "chart",
+   "title": "Charts",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "There are two ways to write one. Form A uses a Markdown table as the data and is the everyday choice. Form B is a Chart.js configuration, for when you need fine control."
+    },
+    {
+     "t": "h",
+     "text": "Form A: from a table"
+    },
+    {
+     "t": "p",
+     "text": "Wrap a table in `:::chart{…}` and close it with `:::`. The first column is the label and every other column is a data series."
+    },
+    {
+     "t": "example",
+     "example": "chart-table",
+     "alt": "A bar chart made from a table, with two series for 2025 and 2026",
+     "result": true
+    },
+    {
+     "t": "p",
+     "text": "Attributes:"
+    },
+    {
+     "t": "table",
+     "head": [
+      "Attribute",
+      "Meaning"
+     ],
+     "rows": [
+      [
+       "`type`",
+       "Kind of chart: `bar`, `line`, `area`, `pie`, `doughnut`, `radar` or `scatter`. Defaults to `bar`"
+      ],
+      [
+       "`title`",
+       "The chart's title"
+      ],
+      [
+       "`stacked`",
+       "Stack the series. Only for `bar` and `line`. Write it as `{type=bar stacked}`"
+      ],
+      [
+       "`height`",
+       "Height in pixels"
+      ],
+      [
+       "`legend`",
+       "Write `legend=false` to hide the legend. It shows by default when there are several series, or for pie charts"
+      ]
+     ]
+    },
+    {
+     "t": "p",
+     "text": "For `scatter`, the first column must be the numeric x value."
+    },
+    {
+     "t": "h",
+     "text": "Form B: Chart.js configuration"
+    },
+    {
+     "t": "p",
+     "text": "A code block whose language is `chart`, holding a Chart.js configuration in YAML or JSON. It needs `type` and `data`, and may add `width` and `height` in pixels."
+    },
+    {
+     "t": "example",
+     "example": "chart-config",
+     "alt": "A line chart drawn from a Chart.js configuration, with Sales and Costs lines",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "YAML cannot hold functions, such as a tooltip callback.",
+      "Series without a colour get the theme's palette. A theme can change it with the CSS variables `--chart-1` to `--chart-8`.",
+      "A bad configuration shows a red error where the chart would be."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "todo",
+   "title": "To-do lists",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "Write `[ ]` for open and `[x]` for done; capital `X` works too. There are three places to put one: on a line of its own, in a list (which can be nested), and in a table cell."
+    },
+    {
+     "t": "example",
+     "example": "todo",
+     "alt": "The three ways to write to-dos: standalone lines, a nested list and table cells",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "Standalone lines and table cells need a space after the bracket; a cell holding only `[x]` does not.",
+      "In a list it is the standard `- [x]` form (a Markdown feature of its own), so it keeps working even when the to-do plugin is off.",
+      "Only a mark at the very start of a line is converted. A `[x]` in the middle of a sentence, or inside inline code, is left alone.",
+      "The checkboxes in the preview and in exports are read-only. To change one, edit the text."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mermaid",
+   "title": "Mermaid diagrams",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "Write a diagram in a code block whose language is `mermaid`. Flowcharts, sequence diagrams, Gantt charts and every other kind Mermaid supports work."
+    },
+    {
+     "t": "example",
+     "example": "mermaid",
+     "alt": "A flowchart drawn from Mermaid code",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "A theme can restyle diagrams with CSS variables that start with `--mermaid-`, such as `--mermaid-line` and `--mermaid-font`.",
+      "A syntax error shows as a red message in the preview."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "math",
+   "title": "LaTeX math",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "Wrap an inline formula in a single `$`, and put a display formula between two lines of `$$`. It uses KaTeX syntax."
+    },
+    {
+     "t": "example",
+     "example": "math",
+     "alt": "An inline formula and an integral on its own line",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "To show a literal dollar sign write `\\$` (for example `\\$5`); otherwise whatever lies between two `$` is read as a formula.",
+      "A `$` inside a code block or inline code is left alone.",
+      "A formula with a mistake is shown in red."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "callout",
+   "title": "Callouts",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "Wrap content in `:::note` or `:::warning` and close it with `:::`. Anything Markdown can do works inside."
+    },
+    {
+     "t": "example",
+     "example": "callout",
+     "alt": "A note callout and a warning callout with its own title",
+     "result": true
+    },
+    {
+     "t": "ul",
+     "items": [
+      "Use `{title=\"…\"}` to change the heading. By default it is note or warning.",
+      "**The outer block needs more colons than any block inside it**, or the inner closing `:::` closes the outer one too. To put a chart in a callout, open it with `::::note` and close it with `::::`.",
+      "A block with a name that is not recognised is shown as a plain block, not as an error."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pagebreak",
+   "title": "Page breaks",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "Write `::pagebreak` on a line of its own. When you print or export to PDF, what follows starts on a new page."
+    },
+    {
+     "t": "example",
+     "example": "pagebreak",
+     "alt": null,
+     "result": false
+    },
+    {
+     "t": "pagebreak"
+    },
+    {
+     "t": "ul",
+     "items": [
+      "It must be alone on its line.",
+      "It is not visible in the preview or on screen; it only breaks the page when printing.",
+      "An exported HTML file breaks the page the same way when it is printed from a browser."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "caption",
+   "title": "Image captions",
+   "blocks": [
+    {
+     "t": "p",
+     "text": "An image on a line of its own, with description text, shows that text under the picture as a caption."
+    },
+    {
+     "t": "example",
+     "example": "caption",
+     "alt": null,
+     "result": false
+    },
+    {
+     "t": "ul",
+     "items": [
+      "An image in the middle of a sentence, or one without description text, has no caption.",
+      "To hide captions, add `figcaption { display: none }` to the theme's CSS.",
+      "The toolbar's image button lets you drop several images in at once; the description is left empty, so add a caption only where you want one."
+     ]
+    }
+   ]
+  }
+ ]
+}

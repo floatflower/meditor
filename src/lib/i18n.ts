@@ -1,7 +1,7 @@
 export type Lang = 'zh-TW' | 'en'
 
 export interface Strings {
-  nav: { features: string; download: string; github: string }
+  nav: { features: string; syntax: string; download: string; github: string }
   hero: {
     badge: string
     title: string
@@ -42,7 +42,7 @@ export interface Strings {
 }
 
 const zh: Strings = {
-  nav: { features: '功能', download: '下載', github: 'GitHub' },
+  nav: { features: '功能', syntax: '語法說明', download: '下載', github: 'GitHub' },
   hero: {
     badge: '免費 · 開源',
     title: '好寫、好擴充的 Markdown 編輯器',
@@ -103,7 +103,7 @@ const zh: Strings = {
 }
 
 const en: Strings = {
-  nav: { features: 'Features', download: 'Download', github: 'GitHub' },
+  nav: { features: 'Features', syntax: 'Syntax guide', download: 'Download', github: 'GitHub' },
   hero: {
     badge: 'Free · Open source',
     title: 'A Markdown editor that is easy to write in, and to extend',

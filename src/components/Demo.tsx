@@ -32,17 +32,17 @@ function steps(lang: Lang): Step[] {
       view: <Todo label={zh ? '交給 AI 審閱' : 'Ask an AI to review'} />
     },
     {
-      src: ':::chart{type=bar title="Words"}',
+      src: ':::chart{type=bar title="Words"}\n| Day | Words |\n| --- | --- |\n| Mon | 420 |\n| Tue | 860 |\n| Wed | 640 |\n:::',
       view: (
         <div className="flex h-16 items-end gap-2 rounded-md border bg-muted/40 px-3 pt-2 pb-1.5">
-          {[38, 62, 48, 86, 70].map((h, i) => (
+          {[48, 100, 74].map((h, i) => (
             <div key={i} className="bar flex-1 rounded-t bg-gradient-to-t from-sky-500 to-violet-500" style={{ height: `${h}%`, animationDelay: `${i * 90}ms` }} />
           ))}
         </div>
       )
     },
     {
-      src: zh ? ':::note 這樣就好看了。' : ':::note That reads well.',
+      src: zh ? ':::note\n這樣就好看了。\n:::' : ':::note\nThat reads well.\n:::',
       view: (
         <div className="rounded-md border-l-4 border-sky-500 bg-sky-500/10 px-3 py-2 text-sm">
           <div className="text-xs font-semibold text-sky-600 uppercase dark:text-sky-400">note</div>
@@ -106,8 +106,8 @@ export default function Demo({ lang }: { lang: Lang }): React.JSX.Element {
         <span className="size-3 rounded-full bg-green-400/80" />
         <span className="ml-3 text-xs text-muted-foreground">notes.md</span>
       </div>
-      <div className="grid min-h-[320px] md:grid-cols-2">
-        <pre className="m-0 overflow-hidden border-b p-5 font-mono text-[13px] leading-7 whitespace-pre-wrap md:border-r md:border-b-0">
+      <div className="grid min-h-[400px] md:grid-cols-2">
+        <pre className="m-0 overflow-hidden border-b p-5 font-mono text-[13px] leading-6 whitespace-pre-wrap md:border-r md:border-b-0">
           {script.map((s, i) => {
             if (i > line) return null
             const text = i < line ? s.src : s.src.slice(0, chars)
