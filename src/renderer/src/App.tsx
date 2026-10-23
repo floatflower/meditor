@@ -385,12 +385,17 @@ export default function App(): React.JSX.Element {
   )
 
   const exportAs = useCallback(
-    async (kind: 'html' | 'pdf') => {
+    async (kind: 'html' | 'html-bundle' | 'pdf') => {
       setStatus(t('status.exporting'))
       try {
         const html = await buildExportHtml(textRef.current, doc.name, theme.css, plugins, doc.path)
-        const ok = kind === 'html' ? await window.api.exportHtml(html) : await window.api.exportPdf(html)
-        setStatus(ok ? t('status.exported', { kind: kind.toUpperCase() }) : '')
+        const ok =
+          kind === 'pdf'
+            ? await window.api.exportPdf(html)
+            : kind === 'html-bundle'
+              ? await window.api.exportHtmlBundle(html)
+              : await window.api.exportHtml(html)
+        setStatus(ok ? t('status.exported', { kind: kind === 'pdf' ? 'PDF' : 'HTML' }) : '')
       } catch (err) {
         setStatus(t('status.exportFailed', { error: err instanceof Error ? err.message : String(err) }))
       }
@@ -530,6 +535,7 @@ export default function App(): React.JSX.Element {
       case 'save-as': return void saveTab(activeIdRef.current, true)
       case 'close-tab': return void closeTab(activeIdRef.current)
       case 'export-html': return void exportAs('html')
+      case 'export-html-bundle': return void exportAs('html-bundle')
       case 'export-pdf': return void exportAs('pdf')
       case 'notice': return setStatus(a.text)
       case 'open-settings': return setSettingsOpen(true)

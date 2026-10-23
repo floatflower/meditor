@@ -2,7 +2,7 @@ import { app, BrowserWindow, Menu, type MenuItemConstructorOptions } from 'elect
 import { t } from './i18n'
 
 export type MenuAction =
-  | { type: 'new' | 'open' | 'save' | 'save-as' | 'export-html' | 'export-pdf' }
+  | { type: 'new' | 'open' | 'save' | 'save-as' | 'export-html' | 'export-html-bundle' | 'export-pdf' }
   | { type: 'close-tab' }
   | { type: 'open-settings' }
   | { type: 'notice'; text: string }
@@ -39,7 +39,8 @@ export function buildMenu(actions: MenuActions): Menu {
         label: t('menu.export'),
         submenu: [
           { label: 'PDF', click: () => send({ type: 'export-pdf' }) },
-          { label: 'HTML', click: () => send({ type: 'export-html' }) }
+          { label: t('menu.exportHtmlEmbedded'), click: () => send({ type: 'export-html' }) },
+          { label: t('menu.exportHtmlBundle'), click: () => send({ type: 'export-html-bundle' }) }
         ]
       },
       ...(isMac ? [] : ([{ type: 'separator' }, { role: 'quit' }] as MenuItemConstructorOptions[]))

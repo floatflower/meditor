@@ -37,7 +37,9 @@
     "minimize": "最小化",
     "zoom": "ズーム",
     "front": "すべてを手前に移動",
-    "closeWindow": "ウインドウを閉じる"
+    "closeWindow": "ウインドウを閉じる",
+    "exportHtmlEmbedded": "HTML（埋め込み）",
+    "exportHtmlBundle": "HTML（バンドル）"
   },
   "dialog": {
     "token": {

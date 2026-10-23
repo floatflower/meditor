@@ -37,7 +37,9 @@
     "minimize": "Minimize",
     "zoom": "Zoom",
     "front": "Bring All to Front",
-    "closeWindow": "Close Window"
+    "closeWindow": "Close Window",
+    "exportHtmlEmbedded": "HTML (Embedded)",
+    "exportHtmlBundle": "HTML (Bundle)"
   },
   "dialog": {
     "token": {

@@ -15,6 +15,15 @@ const isLocal = (src: string): boolean => {
   return !/^[a-z][a-z0-9+.-]+:/i.test(src) // a scheme is two or more characters; `C:\` is a drive
 }
 
+const decodeNameFrom = (src: string): string => {
+  const last = src.split(/[?#]/)[0].split(/[\\/]/).pop() ?? ''
+  try {
+    return decodeURIComponent(last)
+  } catch {
+    return last
+  }
+}
+
 const toDataUri = (bytes: Uint8Array, mime: string): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -55,6 +64,9 @@ export async function inlineLocalImages(html: string, docPath: string | null, as
         img.setAttribute('src', entry.blobUrl)
       } else {
         img.setAttribute('src', await toDataUri(entry.bytes, entry.mime))
+        // The file name, so an export that moves the image out into a file can keep calling it that.
+        const name = decodeNameFrom(src)
+        if (name) img.setAttribute('data-name', name)
       }
     })
   )

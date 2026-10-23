@@ -9,6 +9,7 @@ import type { AiPatch, AiState } from '../shared/ai'
 import { setMainLanguage, t } from './i18n'
 import { access, cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'fs/promises'
 import { embedFonts, type FontKind } from './fonts'
+import { writeHtmlWithAssets } from './exportHtml'
 import { registerImageIpc } from './images'
 
 const userDir = (sub: string): string => join(app.getPath('userData'), sub)
@@ -219,6 +220,17 @@ function registerIpc(): void {
     })
     if (r.canceled || !r.filePath) return false
     await writeFile(r.filePath, html, 'utf-8')
+    return true
+  })
+
+  // The same page, with its images and fonts moved out into a folder beside it.
+  ipcMain.handle('export:html-bundle', async (_e, html: string) => {
+    const r = await dialog.showSaveDialog({
+      defaultPath: 'document.html',
+      filters: [{ name: 'HTML', extensions: ['html'] }]
+    })
+    if (r.canceled || !r.filePath) return false
+    await writeHtmlWithAssets(html, r.filePath, userDir('themes'))
     return true
   })
 

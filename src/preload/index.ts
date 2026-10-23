@@ -15,6 +15,7 @@ const api = {
   saveFile: (path: string | null, content: string) => ipcRenderer.invoke('file:save', path, content),
   embedFonts: (text: string, kinds: ('sans' | 'serif')[]) => ipcRenderer.invoke('fonts:embed', text, kinds) as Promise<string>,
   exportHtml: (html: string) => ipcRenderer.invoke('export:html', html),
+  exportHtmlBundle: (html: string) => ipcRenderer.invoke('export:html-bundle', html),
   exportPdf: (html: string) => ipcRenderer.invoke('export:pdf', html),
   listThemes: () => ipcRenderer.invoke('themes:list'),
   listPlugins: () => ipcRenderer.invoke('plugins:list'),

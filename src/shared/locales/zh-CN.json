@@ -37,7 +37,9 @@
     "minimize": "最小化",
     "zoom": "缩放",
     "front": "全部置于最前",
-    "closeWindow": "关闭窗口"
+    "closeWindow": "关闭窗口",
+    "exportHtmlEmbedded": "HTML（内嵌）",
+    "exportHtmlBundle": "HTML（打包）"
   },
   "dialog": {
     "token": {
