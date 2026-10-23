@@ -1,6 +1,6 @@
-# MEditor website
+# Folio website
 
-The product page for [MEditor](https://github.com/floatflower/meditor). This is an orphan branch: it shares no history
+The product page for [Folio](https://github.com/floatflower/folio). This is an orphan branch: it shares no history
 with `main`, which holds the app itself.
 
 Vite, React, Tailwind v4 and shadcn/ui. Download links come from the GitHub Releases API at page load (no token is
@@ -17,8 +17,8 @@ npm run build     # type-check, then build into docs/
 ## Publishing
 
 Repository Settings → Pages → Build and deployment → Source: **Deploy from a branch**, branch **`website`**, folder
-**`/docs`**. The site is at **https://meditor.floatflower.me** (`public/CNAME` holds the domain and every build copies it into
-`docs/`). Every link is relative, so it also works at `https://<user>.github.io/meditor/`.
+**`/docs`**. The site is at **https://folio.floatflower.me** (`public/CNAME` holds the domain and every build copies it into
+`docs/`). Every link is relative, so it also works at `https://<user>.github.io/folio/`.
 
 ## Editing
 

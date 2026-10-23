@@ -1,7 +1,7 @@
 {
  "ui": {
   "title": "Syntax guide",
-  "subtitle": "MEditor uses standard Markdown plus a few custom pieces of syntax. Every example below comes with its code and with what the app actually renders from it.",
+  "subtitle": "Folio uses standard Markdown plus a few custom pieces of syntax. Every example below comes with its code and with what the app actually renders from it.",
   "toc": "On this page",
   "result": "Rendered result",
   "copy": "Copy",

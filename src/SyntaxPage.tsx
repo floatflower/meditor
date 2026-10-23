@@ -198,7 +198,7 @@ export default function Syntax(): React.JSX.Element {
   const active = useActiveSection(ids)
 
   useEffect(() => {
-    document.title = `${doc.ui.title} — MEditor`
+    document.title = `${doc.ui.title} — Folio`
   }, [doc])
 
   return (

@@ -1,9 +1,9 @@
 {
-  "name": "meditor-website",
+  "name": "folio-website",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Product page for MEditor, published with GitHub Pages from the docs/ folder of this branch.",
+  "description": "Product page for Folio, published with GitHub Pages from the docs/ folder of this branch.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
