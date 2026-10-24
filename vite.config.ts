@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 // GitHub Pages serves the committed docs/ folder of this branch. `base: './'` keeps every link relative, so the
-// page works at https://<user>.github.io/folio/ and on the custom domain alike. public/CNAME (the domain) is copied
+// page works at https://<user>.github.io/sheaf/ and on the custom domain alike. public/CNAME (the domain) is copied
 // into docs/ by every build, since the build empties that folder.
 export default defineConfig({
   base: './',

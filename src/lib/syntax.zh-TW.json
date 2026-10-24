@@ -1,7 +1,7 @@
 {
  "ui": {
   "title": "語法說明",
-  "subtitle": "Folio 使用標準 Markdown，再加上幾個自訂語法。下面每個範例都附上程式碼，以及 app 實際渲染出來的樣子。",
+  "subtitle": "Sheaf 使用標準 Markdown，再加上幾個自訂語法。下面每個範例都附上程式碼，以及 app 實際渲染出來的樣子。",
   "toc": "本頁內容",
   "result": "渲染結果",
   "copy": "複製",

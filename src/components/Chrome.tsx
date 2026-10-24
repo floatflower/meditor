@@ -19,7 +19,7 @@ export function useLang(): [Lang, (lang: Lang) => void] {
   useEffect(() => {
     document.documentElement.lang = lang
     try {
-      localStorage.setItem('folio.site.lang', lang)
+      localStorage.setItem('sheaf.site.lang', lang)
     } catch {
       // not saved
     }
@@ -43,7 +43,7 @@ export function SiteHeader({ lang, onLang, root, current }: HeaderProps) {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-5">
         <a href={`${root || './'}`} className="flex items-center gap-2.5 font-semibold">
           <img src={`${root}icon.png`} alt="" className="size-7 rounded-md" />
-          Folio
+          Sheaf
         </a>
         <nav className="flex items-center gap-1 text-sm">
           <a href={`${root}#features`} className={cn(link, 'text-muted-foreground')}>
@@ -82,7 +82,7 @@ export function SiteFooter({ lang, root }: { lang: Lang; root: string }) {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-8 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <img src={`${root}icon.png`} alt="" className="size-5 rounded" />
-          Folio · {s.footer.license}
+          Sheaf · {s.footer.license}
         </div>
         <div className="flex items-center gap-4">
           <a href={`${root}syntax/`} className="hover:text-foreground">

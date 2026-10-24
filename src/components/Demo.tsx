@@ -10,7 +10,7 @@ interface Step {
 function steps(lang: Lang): Step[] {
   const zh = lang === 'zh-TW'
   return [
-    { src: '# Hello, Folio', view: <h3 className="text-xl font-bold tracking-tight">Hello, Folio</h3> },
+    { src: '# Hello, Sheaf', view: <h3 className="text-xl font-bold tracking-tight">Hello, Sheaf</h3> },
     {
       src: zh ? '下筆 **飛快**，行內公式 $E = mc^2$。' : 'Write **fast**, with $E = mc^2$ inline.',
       view: (

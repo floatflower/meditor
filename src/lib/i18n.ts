@@ -72,7 +72,7 @@ const zh: Strings = {
   },
   showcase: { title: '看起來是這樣', subtitle: '同一份文件，換個主題就是另一種心情。', editor: 'Default 主題，雙欄檢視', manuscript: 'Manuscript 主題（襯線字體）' },
   download: {
-    title: '下載 Folio',
+    title: '下載 Sheaf',
     subtitle: '選你的平台，免費使用。',
     loading: '正在取得最新版本…',
     version: (v) => `版本 ${v}`,
@@ -91,7 +91,7 @@ const zh: Strings = {
     installer: '安裝程式（.exe）',
     install: {
       title: '安裝說明',
-      mac: 'macOS：目前尚未經過 Apple 公證，第一次開啟會被擋下。請到「系統設定 → 隱私權與安全性」，找到 Folio 並按「仍要打開」。',
+      mac: 'macOS：目前尚未經過 Apple 公證，第一次開啟會被擋下。請到「系統設定 → 隱私權與安全性」，找到 Sheaf 並按「仍要打開」。',
       win: 'Windows：SmartScreen 可能顯示「未知的發行者」，請選「其他資訊 → 仍要執行」。',
       linuxAppimage: 'Linux（AppImage）：下載後執行 chmod +x，再直接開啟。Ubuntu 22.04 以後需要先安裝 libfuse2。',
       linuxDeb: 'Linux（.deb）：用 sudo apt install ./檔名.deb 安裝，會自動處理相依套件與沙箱設定。'
@@ -134,7 +134,7 @@ const en: Strings = {
   },
   showcase: { title: 'What it looks like', subtitle: 'The same document in another theme is a different mood.', editor: 'Default theme, split view', manuscript: 'Manuscript theme (serif)' },
   download: {
-    title: 'Download Folio',
+    title: 'Download Sheaf',
     subtitle: 'Pick your platform. It is free.',
     loading: 'Looking up the latest version…',
     version: (v) => `Version ${v}`,
@@ -153,7 +153,7 @@ const en: Strings = {
     installer: 'Installer (.exe)',
     install: {
       title: 'Installing',
-      mac: 'macOS: the app is not notarized by Apple yet, so the first launch is blocked. Open System Settings → Privacy & Security, find Folio and choose "Open Anyway".',
+      mac: 'macOS: the app is not notarized by Apple yet, so the first launch is blocked. Open System Settings → Privacy & Security, find Sheaf and choose "Open Anyway".',
       win: 'Windows: SmartScreen may say "unknown publisher". Choose "More info → Run anyway".',
       linuxAppimage: 'Linux (AppImage): run chmod +x on the file, then open it. Ubuntu 22.04 and later need libfuse2 installed first.',
       linuxDeb: 'Linux (.deb): install with sudo apt install ./file.deb, which also takes care of dependencies and sandbox setup.'
@@ -168,7 +168,7 @@ export const STRINGS: Record<Lang, Strings> = { 'zh-TW': zh, en }
 
 export function initialLang(): Lang {
   try {
-    const saved = localStorage.getItem('folio.site.lang')
+    const saved = localStorage.getItem('sheaf.site.lang')
     if (saved === 'zh-TW' || saved === 'en') return saved
   } catch {
     // no storage

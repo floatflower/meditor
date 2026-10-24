@@ -1,4 +1,4 @@
-export const REPO = { owner: 'floatflower', name: 'folio' }
+export const REPO = { owner: 'floatflower', name: 'sheaf' }
 export const REPO_URL = `https://github.com/${REPO.owner}/${REPO.name}`
 export const RELEASES_URL = `${REPO_URL}/releases`
 
@@ -35,7 +35,7 @@ interface ApiRelease {
   assets: ApiAsset[]
 }
 
-/** The files CI uploads: Folio-<version>-<os>-<arch>.<ext>. Anything else (update metadata, blockmaps) is skipped. */
+/** The files CI uploads: Sheaf-<version>-<os>-<arch>.<ext>. Anything else (update metadata, blockmaps) is skipped. */
 export function classify(asset: ApiAsset): Download | null {
   const { name } = asset
   let platform: Platform
@@ -69,7 +69,7 @@ export function parseRelease(r: ApiRelease): Release {
 }
 
 const API = `https://api.github.com/repos/${REPO.owner}/${REPO.name}/releases`
-const CACHE_KEY = 'folio.release'
+const CACHE_KEY = 'sheaf.release'
 const CACHE_MS = 10 * 60 * 1000
 
 async function get<T>(url: string): Promise<T | null> {
