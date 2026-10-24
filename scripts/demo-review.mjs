@@ -12,9 +12,9 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 
 const arg = process.argv.indexOf('--settings')
 const defaultPath = {
-  darwin: join(homedir(), 'Library', 'Application Support', 'Folio', 'settings.json'),
-  win32: join(process.env.APPDATA ?? '', 'Folio', 'settings.json')
-}[process.platform] ?? join(process.env.XDG_CONFIG_HOME ?? join(homedir(), '.config'), 'Folio', 'settings.json')
+  darwin: join(homedir(), 'Library', 'Application Support', 'Sheaf', 'settings.json'),
+  win32: join(process.env.APPDATA ?? '', 'Sheaf', 'settings.json')
+}[process.platform] ?? join(process.env.XDG_CONFIG_HOME ?? join(homedir(), '.config'), 'Sheaf', 'settings.json')
 const settingsPath = arg > -1 ? process.argv[arg + 1] : defaultPath
 
 let mcp

@@ -47,20 +47,25 @@ interface Tab {
 
 type SaveChoice = 'save' | 'discard' | 'cancel'
 
-const THEME_KEY = 'folio.theme'
-const DISABLED_PLUGINS_KEY = 'folio.disabledPlugins'
+const THEME_KEY = 'sheaf.theme'
+const DISABLED_PLUGINS_KEY = 'sheaf.disabledPlugins'
 // Below this window width the sidebar is tucked away and slides over the editor on demand.
 const NARROW_WIDTH = 900
 const isNarrow = (): boolean => window.innerWidth < NARROW_WIDTH
-const SIDEBAR_KEY = 'folio.sidebarWidth'
+const SIDEBAR_KEY = 'sheaf.sidebarWidth'
 const SIDEBAR_MIN = 160
 const SIDEBAR_MAX = 520
 
-/** Settings used to be stored under `meditor.*` and `mdeditor.*`; read those too so nothing is lost by the renames. */
+/** Settings used to be stored under `folio.*`, `meditor.*` and `mdeditor.*`; read those too so nothing is lost by the renames. */
 function readSetting(key: string): string | null {
   try {
-    const rest = key.replace(/^folio\./, '')
-    return localStorage.getItem(key) ?? localStorage.getItem(`meditor.${rest}`) ?? localStorage.getItem(`mdeditor.${rest}`)
+    const rest = key.replace(/^sheaf\./, '')
+    return (
+      localStorage.getItem(key) ??
+      localStorage.getItem(`folio.${rest}`) ??
+      localStorage.getItem(`meditor.${rest}`) ??
+      localStorage.getItem(`mdeditor.${rest}`)
+    )
   } catch {
     return null
   }

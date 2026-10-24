@@ -3,7 +3,7 @@ import { compareVersions, newerRelease, type ApiRelease } from '../shared/versio
 import type { UpdateState } from '../shared/update'
 
 /** Where "a new version" leads: the product page, whose download section lists the newest installers. */
-const DOWNLOAD_PAGE = 'https://folio.floatflower.me/#download'
+const DOWNLOAD_PAGE = 'https://sheaf.floatflower.me/#download'
 const FIRST_CHECK_MS = 20 * 1000
 const EVERY_MS = 6 * 60 * 60 * 1000
 
@@ -13,8 +13,8 @@ const EVERY_MS = 6 * 60 * 60 * 1000
  * exist to try the feature without a real release: point the first at any URL that returns the same JSON, and the
  * second turns "open the page" into a log line.
  */
-const API = process.env.FOLIO_UPDATE_URL ?? 'https://api.github.com/repos/floatflower/folio/releases?per_page=20'
-const NO_OPEN = process.env.FOLIO_UPDATE_NO_OPEN === '1'
+const API = process.env.SHEAF_UPDATE_URL ?? 'https://api.github.com/repos/floatflower/sheaf/releases?per_page=20'
+const NO_OPEN = process.env.SHEAF_UPDATE_NO_OPEN === '1'
 
 export class UpdateController {
   private state: UpdateState
@@ -28,7 +28,7 @@ export class UpdateController {
   ) {
     this.state = {
       // A development build is not a release, so there is nothing for it to compare against.
-      status: app.isPackaged || process.env.FOLIO_UPDATE_URL ? 'idle' : 'unsupported',
+      status: app.isPackaged || process.env.SHEAF_UPDATE_URL ? 'idle' : 'unsupported',
       currentVersion: app.getVersion(),
       autoCheck: settings().autoCheck,
       notice: false
@@ -56,7 +56,7 @@ export class UpdateController {
     this.set({ status: 'checking', error: undefined })
     try {
       // Always ask: a cached answer would hide a new release for as long as the cache holds it.
-      const res = await net.fetch(API, { cache: 'no-store', headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'Folio' } })
+      const res = await net.fetch(API, { cache: 'no-store', headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'Sheaf' } })
       if (!res.ok) throw new Error(`GitHub answered ${res.status}`)
       const found = newerRelease((await res.json()) as ApiRelease[], this.state.currentVersion)
       if (!found) {

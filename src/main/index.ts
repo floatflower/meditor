@@ -39,7 +39,7 @@ let settings: Settings
 let mcp: McpController
 let updater: UpdateController
 
-// The app used to be called "mdeditor" and then "MEditor", and Electron keys its data folder on the app
+// The app used to be called "mdeditor", "MEditor" and then "Folio", and Electron keys its data folder on the app
 // name. Carry the settings and extensions over to the new folder once. Safe to delete when no old
 // build is around.
 async function migrateLegacyData(): Promise<void> {
@@ -47,7 +47,7 @@ async function migrateLegacyData(): Promise<void> {
   const exists = (path: string): Promise<boolean> => access(path).then(() => true, () => false)
   if (await exists(join(current, 'settings.json'))) return
   let legacy = ''
-  for (const name of ['MEditor', 'mdeditor']) {
+  for (const name of ['Folio', 'MEditor', 'mdeditor']) {
     const dir = join(app.getPath('appData'), name)
     if (dir !== current && (await exists(join(dir, 'settings.json')))) {
       legacy = dir
@@ -145,10 +145,10 @@ function registerIpc(): void {
   ipcMain.handle('ai:get', () => aiState())
   ipcMain.handle('ai:set', (_e, patch: AiPatch) => setAi(patch ?? {}))
   ipcMain.handle('ai:copy-command', () => {
-    clipboard.writeText(`claude mcp add --transport http folio ${mcpUrl()} --header "Authorization: Bearer ${settings.mcp.token}"`)
+    clipboard.writeText(`claude mcp add --transport http sheaf ${mcpUrl()} --header "Authorization: Bearer ${settings.mcp.token}"`)
   })
   ipcMain.handle('ai:copy-json', () => {
-    const config = { mcpServers: { folio: { type: 'http', url: mcpUrl(), headers: { Authorization: `Bearer ${settings.mcp.token}` } } } }
+    const config = { mcpServers: { sheaf: { type: 'http', url: mcpUrl(), headers: { Authorization: `Bearer ${settings.mcp.token}` } } } }
     clipboard.writeText(JSON.stringify(config, null, 2))
   })
   // The window asks the user first; the token is read live, so connected clients are simply refused from now on.
@@ -258,7 +258,7 @@ function registerIpc(): void {
     if (r.canceled || !r.filePath) return false
     const win = new BrowserWindow({ show: false, webPreferences: { sandbox: true } })
     // Through a file: a data: URL is capped at about 2MB, which embedded fonts and KaTeX can exceed.
-    const page = join(app.getPath('temp'), `folio-export-${process.pid}-${Date.now()}.html`)
+    const page = join(app.getPath('temp'), `sheaf-export-${process.pid}-${Date.now()}.html`)
     try {
       await writeFile(page, html, 'utf-8')
       await win.loadFile(page)
